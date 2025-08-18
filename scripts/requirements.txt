@@ -1,0 +1,34 @@
+# PYTHON REQUIREMENTS FILE
+# ========================
+# This file lists all Python dependencies required for the student subject
+# selection system. Install these packages using: pip install -r requirements.txt
+
+# Core web framework for API server
+flask==3.0.0
+flask-cors==4.0.0
+
+# JWT token handling for authentication
+PyJWT==2.8.0
+
+# OpenAI integration for AI-powered features
+openai>=1.0.0
+
+# Environment variable management
+python-dotenv==1.0.0
+
+# Database operations (SQLite is built into Python)
+# No additional database drivers needed for SQLite
+
+# Optional: For production deployment
+# gunicorn==21.2.0
+# waitress==2.1.2
+
+# Optional: For enhanced security
+# bcrypt==4.1.2
+# cryptography==41.0.8
+
+# Development and testing tools (optional)
+# pytest==7.4.3
+# pytest-flask==1.3.0
+# black==23.11.0
+# flake8==6.1.0
