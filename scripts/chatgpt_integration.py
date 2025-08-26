@@ -40,7 +40,7 @@ class ChatGPTSubjectAdvisor:
             api_key (str, optional): OpenAI API key. Uses environment variable if not provided.
         """
         # Get API key from parameter or environment variable
-        self.api_key = api_key or os.getenv('OPENAI_API_KEY')
+        self.api_key = "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"
         
         if not self.api_key:
             raise ValueError("OpenAI API key is required. Set OPENAI_API_KEY environment variable or pass as parameter.")
@@ -52,7 +52,7 @@ class ChatGPTSubjectAdvisor:
         self.crud = StudentCRUD()
         
         # Configuration for AI responses
-        self.default_model = "gpt-4"
+        self.default_model = "gpt-4o-mini"
         self.max_tokens = 1200
         self.temperature = 0.7
     
