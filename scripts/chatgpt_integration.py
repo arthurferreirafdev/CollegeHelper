@@ -107,7 +107,7 @@ async def submit_preferences(form_data: FormData):
     }}
     """
 
-    client = OpenAI(api_key="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")
+    client = OpenAI(api_key="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")
 
     response = client.responses.create(
         model="gpt-4o-mini",

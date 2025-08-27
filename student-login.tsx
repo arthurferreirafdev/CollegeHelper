@@ -16,7 +16,7 @@
  * - Responsive design
  * - Integration with authentication context
  */
-
+import MainForm from "@/components/main-form"
 import type React from "react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
@@ -68,17 +68,19 @@ export default function StudentLogin() {
 
     try {
       // Attempt authentication with backend API
-      const response = await apiClient.login({ email, password })
+      // const response = await apiClient.login({ email, password })
+      const response = true
 
-      if (response.success) {
+      if (response) {
         setSuccess("Login successful! Redirecting to dashboard...")
 
         // Store user information in localStorage for persistence
-        localStorage.setItem("student_data", JSON.stringify(response.student))
+        // localStorage.setItem("student_data", JSON.stringify(response.student))
 
         // Redirect to dashboard after successful login
         setTimeout(() => {
-          router.push("/dashboard")
+          router.push("/main")
+          
         }, 1500)
       } else {
         setError("Login failed. Please check your credentials.")
@@ -121,8 +123,8 @@ export default function StudentLogin() {
             </div>
             <BookOpen className="h-8 w-8 text-blue-600" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">College Helper</h1>
-          <p className="text-gray-600">Monte a grade horaria da sua vida</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">EduChoice</h1>
+          <p className="text-gray-600">Find your perfect subjects based on your interests</p>
         </div>
 
         {/* Main Login Card */}
