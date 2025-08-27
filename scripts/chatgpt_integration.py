@@ -81,22 +81,23 @@ async def submit_preferences(form_data: FormData):
     saturday = form_data.includeSaturday
     notes = form_data.additionalNotes
     total_hours = form_data.totalAvailableHours
-    print(form_data.model_dump())
-    # for day in form_data.weeklySchedule:
-    #     print(f"Day: {day.day}, Available: {day.available}")
-    #     for slot in day.timeSlots:
-    #         print(f"  Slot from {slot.start} to {slot.end}")
-
+    uploaded_file = form_data.uploadedSubjects
+    print(uploaded_file)
+    for day in form_data.weeklySchedule:
+        print(f"Day: {day.day}, Available: {day.available}")
+        for slot in day.timeSlots:
+            print(f"  Slot from {slot.start} to {slot.end}")
+    
+    # print(form_data.model_dump())
+    return {"success": True, "message": "Preferences submitted successfully"}
     #     client = OpenAI(
     #     api_key="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"
     #     )
 
     #     response = client.responses.create(
     #     model="gpt-4o-mini",
-    #     input=json.dumps(form_data.model_dump(), indent=2),
+    #     input=X,
     #     store=True,
     #     )
 
         # print(response.output_text);
-    
-    return {"success": True, "message": "Preferences submitted successfully"}
