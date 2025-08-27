@@ -101,3 +101,28 @@ async def submit_preferences(form_data: FormData):
     #     )
 
         # print(response.output_text);
+    
+@app.get("/timetable")
+async def generateColledgeTimetable():
+    prompt = f""" 
+    Seu objetivo é atuar como um sistema de suporte e recomendação para criação de uma grade horaria com 5 disciplinas, coerente e sem conflitos (duas disciplinas no mesmo dia e horario) para tornar mais eficiente a escolha das materias. A entrada será no formato que condiz com um dicionario em python, sendo [semestre][nome_disciplina][horarios] e o agente deve criar uma grade horária completa, o horario da disciplina sempre esta acompanhado com o dia da semana e isso nao pode ser alterado, tendo {qtd_materias_diarias} disciplinas por dia no período das {inicio_periodo_livre} às {termino_período_livre}, cada disciplina ocupa 2 horarios na semana, ou seja, nao pode ter apenas 1 aula de uma disciplina na semana, priorizando as disciplinas {disciplinas_com_prioridade} como maior prioridade e as demais disciplinas do {periodo_regular} preriodo, e caso falte horarios disponiveis, busque nos períodos sucessivos, levando em consideração a criação de uma grade horaria mais completa possivel, excluindo as disciplinas {disciplinas_cursadas} da lista de candidatas, selecionando outras disciplinas dos proximos períodos que tenham dia da semana e horario iguais, e nao deve ser selecionadas duas disciplinas com nomes iguais, ou que indiquem sequencia ao mesmo tempo. O dia e horario da disciplina são imutáveis. 
+    A saída deve ser um dicionário Python no formato:
+
+    {{
+    "Segunda-feira": ["Disciplina - Horário", "Disciplina - Horário"],
+    "Terça-feira": ["Disciplina - Horário", "Disciplina - Horário"],
+    "Quarta-feira": ["Disciplina - Horário", "Disciplina - Horário"],
+    "Quinta-feira": ["Disciplina - Horário", "Disciplina - Horário"],
+    "Sexta-feira": ["Disciplina - Horário", "Disciplina - Horário"]
+    }}
+    """
+
+    client = OpenAI(api_key="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")
+
+    response = client.responses.create(
+        model="gpt-4o-mini",
+    input=prompt,
+    store=True,
+    )
+
+    print(response.output_text)
