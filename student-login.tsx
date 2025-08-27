@@ -121,8 +121,8 @@ export default function StudentLogin() {
             </div>
             <BookOpen className="h-8 w-8 text-blue-600" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">EduChoice</h1>
-          <p className="text-gray-600">Find your perfect subjects based on your interests</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">College Helper</h1>
+          <p className="text-gray-600">Monte a grade horaria da sua vida</p>
         </div>
 
         {/* Main Login Card */}
