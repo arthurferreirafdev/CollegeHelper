@@ -106,6 +106,16 @@
     FileText,
     X,
   } from "lucide-react"
+import * as pdfjsLib from "pdfjs-dist";
+// @ts-ignore
+import pdfjsWorker from "pdfjs-dist/build/pdf.worker.mjs";
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+  "pdfjs-dist/build/pdf.worker.mjs",
+  import.meta.url
+).toString();
+
+
 
   // Type definitions for form data
   interface TimeSlot {
@@ -331,47 +341,131 @@
     /**
      * Parse uploaded file to extract subject information
      */
-    const parseUploadedFile = (file: File) => {
-      const reader = new FileReader()
+    // const parseUploadedFile = (file: File) => {
+    //   const reader = new FileReader()
 
-      reader.onload = (e) => {
-        try {
-          const content = e.target?.result as string
+    //   reader.onload = (e) => {
+    //     try {
+    //       const content = e.target?.result as string
 
-          // Simple CSV parsing (in production, use a proper CSV parser)
-          if (file.name.endsWith(".csv")) {
-            const lines = content.split("\n")
-            const subjects: UploadedSubject[] = []
+    //       // Simple CSV parsing (in production, use a proper CSV parser)
+    //       if (file.name.endsWith(".csv")) {
+    //         const lines = content.split("\n")
+    //         const subjects: UploadedSubject[] = []
 
-            // Skip header row
-            for (let i = 1; i < lines.length; i++) {
-              const [name, schedule, credits, difficulty] = lines[i].split(",")
-              if (name && schedule) {
-                subjects.push({
-                  name: name.trim(),
-                  schedule: schedule.trim(),
-                  credits: Number.parseInt(credits) || 3,
-                  difficulty: Number.parseInt(difficulty) || 3,
-                })
-              }
-            }
+    //         // Skip header row
+    //         for (let i = 1; i < lines.length; i++) {
+    //           const [name, schedule, credits, difficulty] = lines[i].split(",")
+    //           if (name && schedule) {
+    //             subjects.push({
+    //               name: name.trim(),
+    //               schedule: schedule.trim(),
+    //               credits: Number.parseInt(credits) || 3,
+    //               difficulty: Number.parseInt(difficulty) || 3,
+    //             })
+    //           }
+    //         }
 
-            setUploadedSubjects(subjects)
+    //         setUploadedSubjects(subjects)
+    //       }
+    //       // Handle JSON format
+    //       else if (file.name.endsWith(".json")) {
+    //         const jsonData = JSON.parse(content)
+    //         if (Array.isArray(jsonData)) {
+    //           setUploadedSubjects(jsonData)
+    //         }
+    //       }
+    //     } catch (error) {
+    //       setErrorMessage("Error parsing file. Please check the format.")
+    //     }
+    //   }
+
+    //   reader.readAsText(file)
+    // }
+
+
+
+const parseUploadedFile = async (file: File) => {
+  const reader = new FileReader();
+
+  reader.onload = async (e) => {
+    try {
+      const content = e.target?.result;
+
+      // Handle CSV
+      if (file.name.endsWith(".csv") && typeof content === "string") {
+        const lines = content.split("\n");
+        const subjects: UploadedSubject[] = [];
+
+        for (let i = 1; i < lines.length; i++) {
+          const [name, schedule, credits, difficulty] = lines[i].split(",");
+          if (name && schedule) {
+            subjects.push({
+              name: name.trim(),
+              schedule: schedule.trim(),
+              credits: Number.parseInt(credits) || 3,
+              difficulty: Number.parseInt(difficulty) || 3,
+            });
           }
-          // Handle JSON format
-          else if (file.name.endsWith(".json")) {
-            const jsonData = JSON.parse(content)
-            if (Array.isArray(jsonData)) {
-              setUploadedSubjects(jsonData)
-            }
-          }
-        } catch (error) {
-          setErrorMessage("Error parsing file. Please check the format.")
+        }
+
+        setUploadedSubjects(subjects);
+      }
+      // Handle JSON
+      else if (file.name.endsWith(".json") && typeof content === "string") {
+        const jsonData = JSON.parse(content);
+        if (Array.isArray(jsonData)) {
+          setUploadedSubjects(jsonData);
         }
       }
+      // Handle PDF
+      else if (file.name.endsWith(".pdf")) {
+        const typedArray = new Uint8Array(content as ArrayBuffer);
+        const pdf = await pdfjsLib.getDocument(typedArray).promise;
 
-      reader.readAsText(file)
+        let text = "";
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const pageText = await page.getTextContent();
+          pageText.items.forEach((item: any) => {
+            text += item.str + " ";
+          });
+        }
+
+        // Now `text` contains all PDF text; you can parse it similarly to CSV or JSON
+        console.log(text);
+
+        // Example: simple line split
+        const lines = text.split("\n");
+        const subjects: UploadedSubject[] = [];
+
+        lines.forEach((line) => {
+          const [name, schedule, credits, difficulty] = line.split(",");
+          if (name && schedule) {
+            subjects.push({
+              name: name.trim(),
+              schedule: schedule.trim(),
+              credits: Number.parseInt(credits) || 3,
+              difficulty: Number.parseInt(difficulty) || 3,
+            });
+          }
+        });
+
+        setUploadedSubjects(subjects);
+      }
+    } catch (error) {
+      setErrorMessage("Error parsing file. Please check the format.");
+      console.error(error);
     }
+  };
+
+  if (file.name.endsWith(".pdf")) {
+    reader.readAsArrayBuffer(file); // PDF requires ArrayBuffer
+  } else {
+    reader.readAsText(file);
+  }
+};
+
 
     /**
      * Handle drag and drop events
