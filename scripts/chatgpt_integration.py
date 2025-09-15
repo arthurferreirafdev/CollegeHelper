@@ -27,6 +27,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
 import json
+import re
+import json
+import unicodedata
 
 app = FastAPI()
 
@@ -72,48 +75,65 @@ class FormData(BaseModel):
 # Endpoint to receive form data
 @app.post("/submit-preferences")
 async def submit_preferences(form_data: FormData):
-    # Example: print data to console
-    subject_count = form_data.subjectCount
-    strategy = form_data.preferenceStrategy
-    prioritize = form_data.prioritizeDependencies
-    saturday = form_data.includeSaturday
-    notes = form_data.additionalNotes
-    total_hours = form_data.totalAvailableHours
-    uploaded_file = form_data.uploadedSubjects
-    print(uploaded_file)
-    for day in form_data.weeklySchedule:
-        print(f"Day: {day.day}, Available: {day.available}")
-        for slot in day.timeSlots:
-            print(f"  Slot from {slot.start} to {slot.end}")
-    
-    inicio_periodo_livre = "19:00"
-    termino_período_livre = "22::30"
-    disciplinas_com_prioridade = " "
-    periodo_regular = 3
-    disciplinas_cursadas = " "
-    
-    prompt = f""" 
-    entrada: {uploaded_file}
-
-    Seu objetivo é atuar como um sistema de suporte e recomendação para criação de uma grade horaria com {subject_count} disciplinas, coerente e sem conflitos (duas disciplinas no mesmo dia e horario) para tornar mais eficiente a escolha das materias. A variavel **entrada** será todas as disciplinas disponiveis e o agente deve criar uma grade horária completa, o horario da disciplina sempre esta acompanhado com o dia da semana e isso nao pode ser alterado, no periodo de {inicio_periodo_livre} às {termino_período_livre}, cada disciplina ocupa 2 horarios na semana, ou seja, nao pode ter apenas 1 aula de uma disciplina na semana, priorizando as disciplinas {disciplinas_com_prioridade} como maior prioridade e as demais disciplinas do {periodo_regular} preriodo, e caso falte horarios disponiveis, busque nos períodos sucessivos, levando em consideração a criação de uma grade horaria mais completa possivel, excluindo as disciplinas {disciplinas_cursadas} da lista de candidatas, selecionando outras disciplinas dos proximos períodos que tenham dia da semana e horario iguais, e nao deve ser selecionadas duas disciplinas com nomes iguais, ou que indiquem sequencia ao mesmo tempo. O dia e horario da disciplina são imutáveis. 
-    A saída deve ser um dicionário Python no formato:
-
-    {{
-    "Segunda-feira": ["Disciplina - Horário", "Disciplina - Horário"],
-    "Terça-feira": ["Disciplina - Horário", "Disciplina - Horário"],
-    "Quarta-feira": ["Disciplina - Horário", "Disciplina - Horário"],
-    "Quinta-feira": ["Disciplina - Horário", "Disciplina - Horário"],
-    "Sexta-feira": ["Disciplina - Horário", "Disciplina - Horário"]
-    }}
+    uploaded_file = """
+    "1º período": { "Empreendedorismo em Informática": ["Quarta-feira 19:00 às 20:40", "Sexta-feira 20:50 às 22:30"], "Introdução à Programação de Computadores": ["Terça-feira 19:00 às 20:40", "Quinta-feira 20:50 às 23:30", "Terça-feira 20:50 às 22:30", "Quarta-feira 19:00 às 20:40"], "Introdução aos Sistemas de Informação": ["Quarta-feira 20:50 às 22:30", "Quinta-feira 19:00 às 20:40", "Quarta-feira 19:00 às 20:40", "Quarta-feira 20:50 às 22:30"], "Programação Funcional": ["Não ofertada em 2023/2"], "Lógica para Computação": ["Terça-feira 20:50 às 22:30", "Sexta-feira 19:00 às 20:40", "Terça-feira 19:00 às 20:40", "Quinta-feira 20:50 às 22:30"] }, "2º período": { "Estrutura de Dados 1": ["Terça-feira 19:00 às 20:40", "Quinta-feira 20:50 às 22:30", "Sexta-feira 20:50 às 22:30"], "Matemática 1": ["Segunda-feira 19:00 às 20:40", "Quarta-feira 20:50 às 22:30", "Quinta-feira 19:00 às 20:40"], "Sistemas Digitais": ["Não ofertada em 2023/2"], "Profissão em Sistemas de Informação": ["Não ofertada em 2023/2"], "Programação Lógica": ["Terça-feira 20:50 às 22:30", "Quarta-feira 19:00 às 20:40"] }, "3º período": { "Estrutura de Dados 2": ["Terça-feira 19:00 às 20:40", "Quinta-feira 20:50 às 22:30"], "Matemática 2": ["Segunda-feira 19:00 às 20:40", "Sexta-feira 20:50 às 22:30"], "Arquitetura e Organização de Computadores": ["Terça-feira 20:50 às 22:30", "Sexta-feira 19:00 às 20:40"], "Matemática para Ciência da Computação": ["Quarta-feira 19:00 às 20:40", "Segunda-feira 20:50 às 22:30"], "Programação Orientada a Objetos 1": ["Quarta-feira 20:50 às 22:30", "Quinta-feira 19:00 às 20:40"] }, "4º período": { "Bancos de Dados 1": ["Segunda-feira 19:00 às 20:40", "Quarta-feira 20:50 às 22:30"], "Estatística": ["Terça-feira 19:00 às 20:40", "Sexta-feira 20:50 às 22:30"], "Sistemas Operacionais": ["Terça-feira 20:50 às 22:30", "Sexta-feira 19:00 às 20:40"], "Programação para Internet": ["Quarta-feira 19:00 às 20:40", "Quinta-feira 20:50 às 22:30"], "Programação Orientada a Objetos 2": ["Segunda-feira 20:50 às 22:30", "Quinta-feira 19:00 às 20:40"] }, "5º período": { "Bancos de Dados 2": ["Segunda-feira 19:00 às 20:40", "Quarta-feira 20:50 às 22:30"], "Matemática Financeira e Análise de Investimentos": ["Quinta-feira 19:00 às 20:40", "Sexta-feira 20:50 às 22:30"], "Redes de Computadores": ["Terça-feira 20:50 às 22:30", "Sexta-feira 19:00 às 20:40"], "Organização e Recuperação da Informação": ["Terça-feira 19:00 às 20:40", "Quinta-feira 20:50 às 22:30"], "Modelagem de Software": ["Segunda-feira 20:50 às 22:30", "Quarta-feira 19:00 às 20:40"] }, "6º período": { "Gestão Empresarial": ["Quinta-feira 19:00 às 22:30"], "Otimização": ["Quarta-feira 19:00 às 20:40", "Sexta-feira 20:50 às 22:30"], "Sistemas Distribuídos": ["Terça-feira 19:00 às 20:40", "Quarta-feira 20:50 às 22:30"], "Contabilidade e Análise de Balanços": ["Segunda-feira 19:00 às 22:30"], "Engenharia de Software": ["Terça-feira 20:50 às 22:30", "Sexta-feira 19:00 às 20:40"] }, "7º período": { "Economia": ["Sexta-feira 19:50 às 22:30"], "Fundamentos de Marketing": ["Terça-feira 19:00 às 20:40", "Quarta-feira 20:50 às 22:30"], "Gerência de Projetos de Tecnologia da Informação": ["Quarta-feira 19:00 às 20:40", "Quinta-feira 20:50 às 22:30"], "Projeto e Desenvolvimento de Sistemas de Informação 1": ["Segunda-feira 19:00 às 22:30"], "Trabalho de Conclusão de Curso I": ["Sexta-feira 19:00 às 19:50"], "Tópicos Especiais em Inteligência Artificial": ["Terça-feira 20:50 às 22:30", "Quinta-feira 19:00 às 20:40"] }, "8º período": { "Auditoria e Segurança da Informação": ["Quarta-feira 19:00 às 20:40", "Quinta-feira 20:50 às 22:30"], "Direito e Legislação": ["Sexta-feira 19:50 às 22:30"], "Interação Humano-Computador": ["Terça-feira 19:00 às 20:40", "Quarta-feira 20:50 às 22:30"], "Projeto e Desenvolvimento de Sistemas de Informação 2": ["Segunda-feira 19:00 às 22:30"], "Resolução de Problemas": ["Sábado 08:50 às 12:20"]
     """
 
-    client = OpenAI(api_key="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")
+    disponibilidades = [];
+    i = 0;
+    concatText = ""
+    for day in form_data.weeklySchedule:
+        concatText = concatText + day.day
+        for slot in day.timeSlots:
+            concatText = concatText + " " + slot.start
+            concatText = concatText + " às " + slot.end
+            disponibilidades.append(concatText)
+            i += 1
+            concatText = ""
+
+    i = 0
+
+    prompt = f"""
+    banco de disciplinas: {uploaded_file}
+    normalize o banco de disciplinas para o formato 
+        "período": "",
+        "nome_disciplina": "",
+        "horarios": [""]
+
+    quero qeu retorne somente o array de objetos, sem textos complementares
+    """
+
+    client = OpenAI(api_key="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")
 
     response = client.responses.create(
-        model="gpt-4o-mini",
+    model="gpt-4o-mini",
     input=prompt,
     store=True,
+    temperature=0
     )
 
-    print(response.output_text)    
-    return {"success": True, "message": "Preferences submitted successfully"}
+    conteudo = response.output[0].content[0].text
+    match = re.search(r"```json\n(.*?)\n```", conteudo, re.DOTALL)
+    if not match:
+        raise ValueError("Não foi possível encontrar JSON na resposta do GPT")
+
+    json_text = match.group(1)
+
+    banco_disciplinas = json.loads(json_text)
+
+    resultado = [
+    item for item in banco_disciplinas
+        if sorted(normalize(item["horarios"])) == sorted(normalize(disponibilidades))
+    ]
+    print(resultado)
+    return {"success": True, "result": resultado}
+
+
+def normalize(lst):
+    return [
+        unicodedata.normalize('NFKD', s)
+        .encode('ASCII', 'ignore')
+        .decode()
+        .replace(" ", "")
+        for s in lst
+    ]

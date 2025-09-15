@@ -148,36 +148,6 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
 
   const DAYS_OF_WEEK = ["Monday", "Tuesday"]
 
-
-
-  const PREFERENCE_STRATEGIES = [
-    {
-      value: "maximize_subjects",
-      label: "Maximize Number of Subjects",
-      description: "Get as many subjects as possible within schedule constraints",
-    },
-    {
-      value: "clear_dependencies",
-      label: "Clear Dependencies First",
-      description: "Prioritize subjects that unlock other subjects (prerequisites)",
-    },
-    {
-      value: "balanced_difficulty",
-      label: "Balanced Difficulty",
-      description: "Mix of easy and challenging subjects for optimal learning",
-    },
-    {
-      value: "interest_based",
-      label: "Interest-Based Selection",
-      description: "Focus on subjects matching your interests and career goals",
-    },
-    {
-      value: "high_value_credits",
-      label: "High-Value Credits",
-      description: "Prioritize subjects with higher credit values",
-    },
-  ]
-
   // export default function MainForm() {
   //   // Form state management
   //   const [formData, setFormData] = useState<FormData>({
@@ -522,10 +492,6 @@ const parseUploadedFile = async (file: File) => {
      * Validate form data before submission
      */
     const validateForm = (): boolean => {
-      if (!formData.preferenceStrategy) {
-        setErrorMessage("Please select a preference strategy")
-        return false
-      }
 
       if (formData.subjectCount < 1 || formData.subjectCount > 12) {
         setErrorMessage("Subject count must be between 1 and 12")
@@ -979,12 +945,12 @@ return (
               <BookOpen className="h-5 w-5" />
               Subject Preferences
             </CardTitle>
-            <CardDescription>Define how many subjects you want and your selection strategy</CardDescription>
+            <CardDescription>Defina quantas disciplinas você deseja e sua estratégia de seleção</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Period Select */}
             <div className="space-y-2">
-              <Label>Period</Label>
+              <Label>Período</Label>
               <select
                 className="w-full p-3 bg-gray-50 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 value={formData.subjectCount}
@@ -1002,43 +968,6 @@ return (
                 ))}
               </select>
             </div>
-
-            {/* Preference Strategy */}
-            <div className="space-y-2">
-              <Label htmlFor="strategy">Selection Strategy</Label>
-              <Select value={formData.preferenceStrategy} onValueChange={handleStrategyChange}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Choose your preferred strategy" />
-                </SelectTrigger>
-                <SelectContent>
-                  {PREFERENCE_STRATEGIES.map((strategy) => (
-                    <SelectItem key={strategy.value} value={strategy.value}>
-                      <div>
-                        <div className="font-medium">{strategy.label}</div>
-                        <div className="text-sm text-gray-500">{strategy.description}</div>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Additional Options */}
-            <div className="space-y-3">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="dependencies"
-                  checked={formData.prioritizeDependencies}
-                  onCheckedChange={(checked) =>
-                    setFormData((prev) => ({ ...prev, prioritizeDependencies: checked as boolean }))
-                  }
-                />
-                <Label htmlFor="dependencies" className="text-sm">
-                  Prioritize clearing subject dependencies (prerequisites)
-                </Label>
-              </div>
-              </div>
-
               {/* <div className="flex items-center space-x-2">
                 <Checkbox id="saturday" checked={formData.includeSaturday} onCheckedChange={handleSaturdayToggle} />
                 <Label htmlFor="saturday" className="text-sm">
@@ -1054,9 +983,9 @@ return (
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Calendar className="h-5 w-5" />
-              Weekly Availability
+              Disponibilidade
             </CardTitle>
-            <CardDescription>Select your 2 available days and set time slots</CardDescription>
+            <CardDescription>Selecione seus 2 dias disponíveis e defina intervalos de tempo</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -1076,11 +1005,11 @@ return (
                         </SelectTrigger>
                         <SelectContent>
                           {[
-                            "Monday",
-                            "Tuesday",
-                            "Wednesday",
-                            "Thursday",
-                            "Friday",
+                            "Segunda-feira",
+                            "Terça-feira",
+                            "Quarta-feira",
+                            "Quinta-feira",
+                            "Sexta-feira",
                           ].map((day) => (
                             <SelectItem
                               key={day}
