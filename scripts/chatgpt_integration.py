@@ -126,7 +126,7 @@ def getCollegeGradeFromFile(subjects_list):
     }}
     """
 
-    client = OpenAI(api_key="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")
+    client = OpenAI(api_key="")
 
     response = client.responses.create(
         model="gpt-4o-mini",
