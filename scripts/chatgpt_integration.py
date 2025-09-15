@@ -103,7 +103,7 @@ async def submit_preferences(form_data: FormData):
     quero qeu retorne somente o array de objetos, sem textos complementares
     """
 
-    client = OpenAI(api_key="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")
+    client = OpenAI(api_key="") #adicionar chave
 
     response = client.responses.create(
     model="gpt-4o-mini",
