@@ -1,70 +1,3 @@
-// "use client"
-
-  // /**
-  //  * MAIN PAGE COMPONENT
-  //  * ==================
-  //  * This page serves as the main entry point for students to configure
-  //  * their subject selection preferences. It includes authentication check
-  //  * and renders the main form component.
-  //  */
-
-  // import { useEffect, useState } from "react"
-  // import { useRouter } from "next/navigation"
-  // import MainForm from "@/components/main-form"
-  // import { apiClient } from "@/lib/api"
-  // import { Loader2 } from "lucide-react"
-
-  // export default function MainPage() {
-  //   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
-  //   const [studentData, setStudentData] = useState<any>(null)
-  //   const router = useRouter()
-
-  //   useEffect(() => {
-  //     // Check authentication status
-  //     const checkAuth = async () => {
-  //       try {
-  //         if (apiClient.isAuthenticated()) {
-  //           const response = await apiClient.getProfile()
-  //           if (response.success) {
-  //             setStudentData(response.student)
-  //             setIsAuthenticated(true)
-  //           } else {
-  //             setIsAuthenticated(false)
-  //             router.push("/login")
-  //           }
-  //         } else {
-  //           setIsAuthenticated(false)
-  //           router.push("/login")
-  //         }
-  //       } catch (error) {
-  //         setIsAuthenticated(false)
-  //         router.push("/login")
-  //       }
-  //     }
-
-  //     checkAuth()
-  //   }, [router])
-
-  //   // Show loading while checking authentication
-  //   if (isAuthenticated === null) {
-  //     return (
-  //       <div className="min-h-screen flex items-center justify-center">
-  //         <div className="text-center">
-  //           <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-  //           <p className="text-gray-600">Loading...</p>
-  //         </div>
-  //       </div>
-  //     )
-  //   }
-
-  //   // Show main form if authenticated
-  //   if (isAuthenticated) {
-  //     return <MainForm />
-  //   }
-
-  //   // This shouldn't render due to redirect, but just in case
-  //   return null
-  // }
   "use client"
 
   /**
@@ -173,7 +106,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
     weeklySchedule: DAYS_OF_WEEK.map((day) => ({
       day,
       available: true,
-      timeSlots: [{ start: "09:00", end: "17:00" }],
+      timeSlots: [{ start: "19:00", end: "20:40"}],
     })),
     additionalNotes: "",
     uploadedFile: null,
@@ -245,7 +178,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
                 available,
                 timeSlots:
                   available && schedule.timeSlots.length === 0
-                    ? [{ start: "09:00", end: "17:00" }]
+                    ? [{start: "19:00", end: "20:40"}]
                     : available
                       ? schedule.timeSlots
                       : [],
@@ -339,50 +272,6 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
     /**
      * Parse uploaded file to extract subject information
      */
-    // const parseUploadedFile = (file: File) => {
-    //   const reader = new FileReader()
-
-    //   reader.onload = (e) => {
-    //     try {
-    //       const content = e.target?.result as string
-
-    //       // Simple CSV parsing (in production, use a proper CSV parser)
-    //       if (file.name.endsWith(".csv")) {
-    //         const lines = content.split("\n")
-    //         const subjects: UploadedSubject[] = []
-
-    //         // Skip header row
-    //         for (let i = 1; i < lines.length; i++) {
-    //           const [name, schedule, credits, difficulty] = lines[i].split(",")
-    //           if (name && schedule) {
-    //             subjects.push({
-    //               name: name.trim(),
-    //               schedule: schedule.trim(),
-    //               credits: Number.parseInt(credits) || 3,
-    //               difficulty: Number.parseInt(difficulty) || 3,
-    //             })
-    //           }
-    //         }
-
-    //         setUploadedSubjects(subjects)
-    //       }
-    //       // Handle JSON format
-    //       else if (file.name.endsWith(".json")) {
-    //         const jsonData = JSON.parse(content)
-    //         if (Array.isArray(jsonData)) {
-    //           setUploadedSubjects(jsonData)
-    //         }
-    //       }
-    //     } catch (error) {
-    //       setErrorMessage("Error parsing file. Please check the format.")
-    //     }
-    //   }
-
-    //   reader.readAsText(file)
-    // }
-
-
-
 const parseUploadedFile = async (file: File) => {
   const reader = new FileReader();
 
@@ -452,7 +341,7 @@ const parseUploadedFile = async (file: File) => {
         setUploadedSubjects(subjects);
       }
     } catch (error) {
-      setErrorMessage("Error parsing file. Please check the format.");
+      setErrorMessage("Error parsing file. Please check the format. " + error);
       console.error(error);
     }
   };
@@ -596,338 +485,6 @@ const parseUploadedFile = async (file: File) => {
         fileInputRef.current.value = ""
       }
     }
-
-//     return (
-//       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-//         <div className="max-w-4xl mx-auto">
-//           {/* Header */}
-//           <div className="text-center mb-8">
-//             <h1 className="text-4xl font-bold text-gray-900 mb-2">Subject Selection Preferences</h1>
-//             <p className="text-gray-600">Configure your preferences for optimal subject scheduling</p>
-//           </div>
-
-//           <form onSubmit={handleSubmit} className="space-y-6">
-//             {/* Subject Count and Strategy */}
-//             <Card>
-//               <CardHeader>
-//                 <CardTitle className="flex items-center gap-2">
-//                   <BookOpen className="h-5 w-5" />
-//                   Subject Preferences
-//                 </CardTitle>
-//                 <CardDescription>Define how many subjects you want and your selection strategy</CardDescription>
-//               </CardHeader>
-//               <CardContent className="space-y-4">
-//                 {/* Subject Count */}
-//                 {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-//                   <div className="space-y-2">
-//                     <Label htmlFor="subjectCount">Number of Subjects This Period</Label>
-//                     <Input
-//                       id="subjectCount"
-//                       type="number"
-//                       min="1"
-//                       max="12"
-//                       value={formData.subjectCount}
-//                       onChange={(e) => handleSubjectCountChange(e.target.value)}
-//                       className="w-full"
-//                     />
-//                     <p className="text-sm text-gray-500">Choose between 1-12 subjects</p>
-//                   </div> */}
-
-//                   {/* <div className="space-y-2">
-//                     <Label>Total Available Hours/Week</Label>
-//                     <div className="p-3 bg-gray-50 rounded-md">
-//                       <span className="text-2xl font-bold text-blue-600">
-//                         {calculateTotalAvailableHours().toFixed(1)}
-//                       </span>
-//                       <span className="text-gray-600 ml-1">hours</span>
-//                     </div>
-//                   </div> */}
-//                     {/* <div className="space-y-2">
-//                       <Label>Period</Label>
-//                       <div className="p-3 bg-gray-50 rounded-md">
-//                         <span className="text-2xl font-bold text-blue-600">
-//                           {calculateTotalAvailableHours().toFixed(1)}
-//                         </span>
-//                         <span className="text-gray-600 ml-1">hours</span>
-//                       </div>
-//                     </div> */}
-//                     <div className="space-y-2">
-//   <Label>Period</Label>
-//   <select
-//     className="w-full p-3 bg-gray-50 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-//     value={formData.subjectCount} // or use formData.period if you create that
-//     onChange={(e) =>
-//       setFormData((prev) => ({
-//         ...prev,
-//         subjectCount: Number(e.target.value),
-//       }))
-//     }
-//   >
-//     {Array.from({ length: 8 }, (_, i) => i + 1).map((period) => (
-//       <option key={period} value={period}>
-//         {period}
-//       </option>
-//     ))}
-//   </select>
-// </div>
-
-//                 {/* </div> */}
-
-//                 {/* Preference Strategy */}
-//                 <div className="space-y-2">
-//                   <Label htmlFor="strategy">Selection Strategy</Label>
-//                   <Select value={formData.preferenceStrategy} onValueChange={handleStrategyChange}>
-//                     <SelectTrigger> 
-//                       <SelectValue placeholder="Choose your preferred strategy" />
-//                     </SelectTrigger>
-//                     <SelectContent>
-//                       {PREFERENCE_STRATEGIES.map((strategy) => (
-//                         <SelectItem key={strategy.value} value={strategy.value}>
-//                           <div>
-//                             <div className="font-medium">{strategy.label}</div>
-//                             <div className="text-sm text-gray-500">{strategy.description}</div>
-//                           </div>
-//                         </SelectItem>
-//                       ))}
-//                     </SelectContent>
-//                   </Select>
-//                 </div>
-
-//                 {/* Additional Options */}
-//                 <div className="space-y-3">
-//                   <div className="flex items-center space-x-2">
-//                     <Checkbox
-//                       id="dependencies"
-//                       checked={formData.prioritizeDependencies}
-//                       onCheckedChange={(checked) =>
-//                         setFormData((prev) => ({ ...prev, prioritizeDependencies: checked as boolean }))
-//                       }
-//                     />
-//                     <Label htmlFor="dependencies" className="text-sm">
-//                       Prioritize clearing subject dependencies (prerequisites)
-//                     </Label>
-//                   </div>
-
-//                   <div className="flex items-center space-x-2">
-//                     <Checkbox id="saturday" checked={formData.includeSaturday} onCheckedChange={handleSaturdayToggle} />
-//                     <Label htmlFor="saturday" className="text-sm">
-//                       Include Saturday classes in my schedule
-//                     </Label>
-//                   </div>
-//                 </div>
-//               </CardContent>
-//             </Card>
-
-//             {/* Weekly Schedule */}
-//             <Card>
-//               <CardHeader>
-//                 <CardTitle className="flex items-center gap-2">
-//                   <Calendar className="h-5 w-5" />
-//                   Weekly Availability
-//                 </CardTitle>
-//                 <CardDescription>Set your available hours for each day of the week</CardDescription>
-//               </CardHeader>
-//               <CardContent>
-//                 <div className="space-y-4">
-//                   {formData.weeklySchedule.map((schedule, dayIndex) => (
-//                     <div key={schedule.day} className="border rounded-lg p-4">
-//                       <div className="flex items-center justify-between mb-3">
-//                         <div className="flex items-center space-x-3">
-//                           <Checkbox
-//                             checked={schedule.available}
-//                             onCheckedChange={(checked) => handleDayToggle(dayIndex, checked as boolean)}
-//                             disabled={schedule.day === "Saturday" && !formData.includeSaturday}
-//                           />
-//                           <Label className="font-medium">{schedule.day}</Label>
-//                           {schedule.available && (
-//                             <Badge variant="secondary">
-//                               {schedule.timeSlots.length} slot{schedule.timeSlots.length !== 1 ? "s" : ""}
-//                             </Badge>
-//                           )}
-//                         </div>
-
-//                         {schedule.available && (
-//                           <Button type="button" variant="outline" size="sm" onClick={() => addTimeSlot(dayIndex)}>
-//                             Add Time Slot
-//                           </Button>
-//                         )}
-//                       </div>
-
-//                       {schedule.available && (
-//                         <div className="space-y-2">
-//                           {schedule.timeSlots.map((slot, slotIndex) => (
-//                             <div key={slotIndex} className="flex items-center gap-2">
-//                               <Clock className="h-4 w-4 text-gray-400" />
-//                               <Input
-//                                 type="time"
-//                                 value={slot.start}
-//                                 onChange={(e) => handleTimeSlotChange(dayIndex, slotIndex, "start", e.target.value)}
-//                                 className="w-32"
-//                               />
-//                               <span className="text-gray-500">to</span>
-//                               <Input
-//                                 type="time"
-//                                 value={slot.end}
-//                                 onChange={(e) => handleTimeSlotChange(dayIndex, slotIndex, "end", e.target.value)}
-//                                 className="w-32"
-//                               />
-//                               {schedule.timeSlots.length > 1 && (
-//                                 <Button
-//                                   type="button"
-//                                   variant="ghost"
-//                                   size="sm"
-//                                   onClick={() => removeTimeSlot(dayIndex, slotIndex)}
-//                                 >
-//                                   <X className="h-4 w-4" />
-//                                 </Button>
-//                               )}
-//                             </div>
-//                           ))}
-//                         </div>
-//                       )}
-//                     </div>
-//                   ))}
-//                 </div>
-//               </CardContent>
-//             </Card>
-
-//             {/* File Upload */}
-//             <Card>
-//               <CardHeader>
-//                 <CardTitle className="flex items-center gap-2">
-//                   <Upload className="h-5 w-5" />
-//                   Subject Schedule File
-//                 </CardTitle>
-//                 <CardDescription>Upload a file containing subject information and their weekly schedules</CardDescription>
-//               </CardHeader>
-//               <CardContent>
-//                 <div
-//                   className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
-//                     dragActive ? "border-blue-400 bg-blue-50" : "border-gray-300"
-//                   }`}
-//                   onDragEnter={handleDrag}
-//                   onDragLeave={handleDrag}
-//                   onDragOver={handleDrag}
-//                   onDrop={handleDrop}
-//                 >
-//                   {formData.uploadedFile ? (
-//                     <div className="space-y-3">
-//                       <div className="flex items-center justify-center gap-2">
-//                         <FileText className="h-8 w-8 text-green-600" />
-//                         <div>
-//                           <p className="font-medium">{formData.uploadedFile.name}</p>
-//                           <p className="text-sm text-gray-500">{(formData.uploadedFile.size / 1024).toFixed(1)} KB</p>
-//                         </div>
-//                       </div>
-//                       <Button type="button" variant="outline" size="sm" onClick={removeUploadedFile}>
-//                         Remove File
-//                       </Button>
-//                     </div>
-//                   ) : (
-//                     <div className="space-y-3">
-//                       <Upload className="h-12 w-12 text-gray-400 mx-auto" />
-//                       <div>
-//                         <p className="text-lg font-medium">Drop your file here</p>
-//                         <p className="text-gray-500">or click to browse</p>
-//                       </div>
-//                       <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
-//                         Choose File
-//                       </Button>
-//                       <input
-//                         ref={fileInputRef}
-//                         type="file"
-//                         accept=".csv,.json,.txt,.xlsx"
-//                         onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0])}
-//                         className="hidden"
-//                       />
-//                     </div>
-//                   )}
-//                 </div>
-
-//                 <div className="mt-4 text-sm text-gray-600">
-//                   <p className="font-medium mb-2">Supported formats:</p>
-//                   <ul className="list-disc list-inside space-y-1">
-//                     <li>CSV: subject_name, schedule_time, credits, difficulty</li>
-//                     <li>JSON: Array of subject objects</li>
-//                     <li>Excel: Structured subject data</li>
-//                   </ul>
-//                 </div>
-
-//                 {/* Display uploaded subjects */}
-//                 {uploadedSubjects.length > 0 && (
-//                   <div className="mt-4">
-//                     <h4 className="font-medium mb-2">Uploaded Subjects ({uploadedSubjects.length})</h4>
-//                     <div className="max-h-40 overflow-y-auto space-y-1">
-//                       {uploadedSubjects.map((subject, index) => (
-//                         <div key={index} className="flex justify-between items-center p-2 bg-gray-50 rounded">
-//                           <span className="font-medium">{subject.name}</span>
-//                           <div className="flex gap-2 text-sm text-gray-600">
-//                             <span>{subject.schedule}</span>
-//                             <Badge variant="outline">{subject.credits} credits</Badge>
-//                           </div>
-//                         </div>
-//                       ))}
-//                     </div>
-//                   </div>
-//                 )}
-//               </CardContent>
-//             </Card>
-
-//             {/* Additional Notes */}
-//             <Card>
-//               <CardHeader>
-//                 <CardTitle className="flex items-center gap-2">
-//                   <Settings className="h-5 w-5" />
-//                   Additional Preferences
-//                 </CardTitle>
-//                 <CardDescription>Any additional notes or specific requirements</CardDescription>
-//               </CardHeader>
-//               <CardContent>
-//                 <Textarea
-//                   placeholder="Enter any additional preferences, constraints, or notes about your subject selection..."
-//                   value={formData.additionalNotes}
-//                   onChange={(e) => setFormData((prev) => ({ ...prev, additionalNotes: e.target.value }))}
-//                   rows={4}
-//                   className="w-full"
-//                 />
-//               </CardContent>
-//             </Card>
-
-//             {/* Status Messages */}
-//             {errorMessage && (
-//               <Alert variant="destructive">
-//                 <AlertCircle className="h-4 w-4" />
-//                 <AlertDescription>{errorMessage}</AlertDescription>
-//               </Alert>
-//             )}
-
-//             {submitStatus === "success" && (
-//               <Alert className="border-green-200 bg-green-50">
-//                 <CheckCircle className="h-4 w-4 text-green-600" />
-//                 <AlertDescription className="text-green-800">
-//                   Preferences submitted successfully! We'll process your request and get back to you soon.
-//                 </AlertDescription>
-//               </Alert>
-//             )}
-
-//             {/* Submit Button */}
-//             <div className="flex justify-center">
-//               <Button type="submit" size="lg" disabled={isSubmitting} className="w-full md:w-auto px-8">
-//                 {isSubmitting ? (
-//                   <>
-//                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-//                     Processing Preferences...
-//                   </>
-//                 ) : (
-//                   "Submit Preferences"
-//                 )}
-//               </Button>
-//             </div>
-//           </form>
-//         </div>
-//       </div>
-//     )
-//   }
 return (
   <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
     <div className="max-w-4xl mx-auto">
@@ -1083,9 +640,9 @@ return (
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Upload className="h-5 w-5" />
-              Subject Schedule File
+              Enviar Plano de Disciplinas
             </CardTitle>
-            <CardDescription>Upload a file containing subject information and their weekly schedules</CardDescription>
+            <CardDescription>Envie um arquivo que tenha das disciplinas e os horarios do seu curso</CardDescription>
           </CardHeader>
           <CardContent>
             <div
@@ -1116,16 +673,16 @@ return (
                 <div className="space-y-3">
                   <Upload className="h-12 w-12 text-gray-400 mx-auto" />
                   <div>
-                    <p className="text-lg font-medium">Drop your file here</p>
-                    <p className="text-gray-500">or click to browse</p>
+                    <p className="text-lg font-medium">Arraste e solte seu arquivo</p>
+                    <p className="text-gray-500">ou clique em escolher arquivo</p>
                   </div>
                   <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
-                    Choose File
+                    Escolher Arquivo
                   </Button>
                   <input
                     ref={fileInputRef}
                     type="file"
-                    accept=".csv,.json,.txt,.xlsx"
+                    accept=".csv,.json,.txt,.xlsx,.pdf"
                     onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0])}
                     className="hidden"
                   />
@@ -1173,7 +730,7 @@ return (
           </CardHeader>
           <CardContent>
             <Textarea
-              placeholder="Enter any additional preferences, constraints, or notes about your subject selection..."
+              placeholder=""
               value={formData.additionalNotes}
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, additionalNotes: e.target.value }))
@@ -1210,7 +767,7 @@ return (
                 Processing Preferences...
               </>
             ) : (
-              "Submit Preferences"
+              "Enviar Preferências"
             )}
           </Button>
         </div>

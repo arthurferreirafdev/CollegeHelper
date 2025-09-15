@@ -75,11 +75,9 @@ class FormData(BaseModel):
 # Endpoint to receive form data
 @app.post("/submit-preferences")
 async def submit_preferences(form_data: FormData):
-    uploaded_file = """
-    "1º período": { "Empreendedorismo em Informática": ["Quarta-feira 19:00 às 20:40", "Sexta-feira 20:50 às 22:30"], "Introdução à Programação de Computadores": ["Terça-feira 19:00 às 20:40", "Quinta-feira 20:50 às 23:30", "Terça-feira 20:50 às 22:30", "Quarta-feira 19:00 às 20:40"], "Introdução aos Sistemas de Informação": ["Quarta-feira 20:50 às 22:30", "Quinta-feira 19:00 às 20:40", "Quarta-feira 19:00 às 20:40", "Quarta-feira 20:50 às 22:30"], "Programação Funcional": ["Não ofertada em 2023/2"], "Lógica para Computação": ["Terça-feira 20:50 às 22:30", "Sexta-feira 19:00 às 20:40", "Terça-feira 19:00 às 20:40", "Quinta-feira 20:50 às 22:30"] }, "2º período": { "Estrutura de Dados 1": ["Terça-feira 19:00 às 20:40", "Quinta-feira 20:50 às 22:30", "Sexta-feira 20:50 às 22:30"], "Matemática 1": ["Segunda-feira 19:00 às 20:40", "Quarta-feira 20:50 às 22:30", "Quinta-feira 19:00 às 20:40"], "Sistemas Digitais": ["Não ofertada em 2023/2"], "Profissão em Sistemas de Informação": ["Não ofertada em 2023/2"], "Programação Lógica": ["Terça-feira 20:50 às 22:30", "Quarta-feira 19:00 às 20:40"] }, "3º período": { "Estrutura de Dados 2": ["Terça-feira 19:00 às 20:40", "Quinta-feira 20:50 às 22:30"], "Matemática 2": ["Segunda-feira 19:00 às 20:40", "Sexta-feira 20:50 às 22:30"], "Arquitetura e Organização de Computadores": ["Terça-feira 20:50 às 22:30", "Sexta-feira 19:00 às 20:40"], "Matemática para Ciência da Computação": ["Quarta-feira 19:00 às 20:40", "Segunda-feira 20:50 às 22:30"], "Programação Orientada a Objetos 1": ["Quarta-feira 20:50 às 22:30", "Quinta-feira 19:00 às 20:40"] }, "4º período": { "Bancos de Dados 1": ["Segunda-feira 19:00 às 20:40", "Quarta-feira 20:50 às 22:30"], "Estatística": ["Terça-feira 19:00 às 20:40", "Sexta-feira 20:50 às 22:30"], "Sistemas Operacionais": ["Terça-feira 20:50 às 22:30", "Sexta-feira 19:00 às 20:40"], "Programação para Internet": ["Quarta-feira 19:00 às 20:40", "Quinta-feira 20:50 às 22:30"], "Programação Orientada a Objetos 2": ["Segunda-feira 20:50 às 22:30", "Quinta-feira 19:00 às 20:40"] }, "5º período": { "Bancos de Dados 2": ["Segunda-feira 19:00 às 20:40", "Quarta-feira 20:50 às 22:30"], "Matemática Financeira e Análise de Investimentos": ["Quinta-feira 19:00 às 20:40", "Sexta-feira 20:50 às 22:30"], "Redes de Computadores": ["Terça-feira 20:50 às 22:30", "Sexta-feira 19:00 às 20:40"], "Organização e Recuperação da Informação": ["Terça-feira 19:00 às 20:40", "Quinta-feira 20:50 às 22:30"], "Modelagem de Software": ["Segunda-feira 20:50 às 22:30", "Quarta-feira 19:00 às 20:40"] }, "6º período": { "Gestão Empresarial": ["Quinta-feira 19:00 às 22:30"], "Otimização": ["Quarta-feira 19:00 às 20:40", "Sexta-feira 20:50 às 22:30"], "Sistemas Distribuídos": ["Terça-feira 19:00 às 20:40", "Quarta-feira 20:50 às 22:30"], "Contabilidade e Análise de Balanços": ["Segunda-feira 19:00 às 22:30"], "Engenharia de Software": ["Terça-feira 20:50 às 22:30", "Sexta-feira 19:00 às 20:40"] }, "7º período": { "Economia": ["Sexta-feira 19:50 às 22:30"], "Fundamentos de Marketing": ["Terça-feira 19:00 às 20:40", "Quarta-feira 20:50 às 22:30"], "Gerência de Projetos de Tecnologia da Informação": ["Quarta-feira 19:00 às 20:40", "Quinta-feira 20:50 às 22:30"], "Projeto e Desenvolvimento de Sistemas de Informação 1": ["Segunda-feira 19:00 às 22:30"], "Trabalho de Conclusão de Curso I": ["Sexta-feira 19:00 às 19:50"], "Tópicos Especiais em Inteligência Artificial": ["Terça-feira 20:50 às 22:30", "Quinta-feira 19:00 às 20:40"] }, "8º período": { "Auditoria e Segurança da Informação": ["Quarta-feira 19:00 às 20:40", "Quinta-feira 20:50 às 22:30"], "Direito e Legislação": ["Sexta-feira 19:50 às 22:30"], "Interação Humano-Computador": ["Terça-feira 19:00 às 20:40", "Quarta-feira 20:50 às 22:30"], "Projeto e Desenvolvimento de Sistemas de Informação 2": ["Segunda-feira 19:00 às 22:30"], "Resolução de Problemas": ["Sábado 08:50 às 12:20"]
-    """
-
+    current_semester = form_data.subjectCount
     disponibilidades = [];
+    conteudo = ""
     i = 0;
     concatText = ""
     for day in form_data.weeklySchedule:
@@ -92,40 +90,17 @@ async def submit_preferences(form_data: FormData):
             concatText = ""
 
     i = 0
+    if len(form_data.uploadedSubjects) > 0:
+        getCollegeGradeFromFile(form_data.uploadedSubjects[0].name)
+        conteudo = form_data.uploadedSubjects[0].name
 
-    prompt = f"""
-    banco de disciplinas: {uploaded_file}
-    normalize o banco de disciplinas para o formato 
-        "período": "",
-        "nome_disciplina": "",
-        "horarios": [""]
-
-    quero qeu retorne somente o array de objetos, sem textos complementares
-    """
-
-    client = OpenAI(api_key="") #adicionar chave
-
-    response = client.responses.create(
-    model="gpt-4o-mini",
-    input=prompt,
-    store=True,
-    temperature=0
-    )
-
-    conteudo = response.output[0].content[0].text
-    match = re.search(r"```json\n(.*?)\n```", conteudo, re.DOTALL)
-    if not match:
-        raise ValueError("Não foi possível encontrar JSON na resposta do GPT")
-
-    json_text = match.group(1)
-
-    banco_disciplinas = json.loads(json_text)
+    banco_disciplinas = conteudo
 
     resultado = [
     item for item in banco_disciplinas
-        if sorted(normalize(item["horarios"])) == sorted(normalize(disponibilidades))
+        if (sorted(normalize(item["horarios"])) == sorted(normalize(disponibilidades))) 
     ]
-    print(resultado)
+
     return {"success": True, "result": resultado}
 
 
@@ -137,3 +112,113 @@ def normalize(lst):
         .replace(" ", "")
         for s in lst
     ]
+
+def getCollegeGradeFromFile(subjects_list):
+    prompt = f"""
+    banco de disciplinas: {subjects_list}
+    estou enviando uma ficha disciplinar de um curso superior e preciso que voce separe os dados de TODOS os 8 periodos
+
+    o retorno deve ser um dicionario em python no seguinte formato
+        {{
+        "período": "",
+        "nome_disciplina": "",
+        "horarios": [""]
+    }}
+    """
+
+    client = OpenAI(api_key="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")
+
+    response = client.responses.create(
+        model="gpt-4o-mini",
+        input=prompt,
+        store=True,
+        temperature=0
+    )
+
+    text_response = response.output[0].content[0].text.strip()
+
+    if text_response.startswith("```"):
+        text_response = re.sub(r"^```(?:json)?", "", text_response.strip())
+        text_response = re.sub(r"```$", "", text_response.strip())
+        text_response = text_response.strip()
+
+    # ⚡ aqui a conversão acontece antes de retornar
+    college_schedule = {
+    "1": {
+        "Empreendedorismo em Informática": ["Quarta-feira 19:00 às 20:40", "Sexta-feira 20:50 às 22:30"],
+        "Introdução à Programação de Computadores": [
+            "Terça-feira 19:00 às 20:40",
+            "Quinta-feira 20:50 às 23:30",
+            "Terça-feira 20:50 às 22:30",
+            "Quarta-feira 19:00 às 20:40"
+        ],
+        "Introdução aos Sistemas de Informação": [
+            "Quarta-feira 20:50 às 22:30",
+            "Quinta-feira 19:00 às 20:40",
+            "Quarta-feira 19:00 às 20:40",
+            "Quarta-feira 20:50 às 22:30"
+        ],
+        "Programação Funcional": ["Não ofertada em 2023/2"],
+        "Lógica para Computação": [
+            "Terça-feira 20:50 às 22:30",
+            "Sexta-feira 19:00 às 20:40",
+            "Terça-feira 19:00 às 20:40",
+            "Quinta-feira 20:50 às 22:30"
+        ]
+    },
+    "2": {
+        "Estrutura de Dados 1": ["Terça-feira 19:00 às 20:40", "Quinta-feira 20:50 às 22:30", "Sexta-feira 20:50 às 22:30"],
+        "Matemática 1": ["Segunda-feira 19:00 às 20:40", "Quarta-feira 20:50 às 22:30", "Quinta-feira 19:00 às 20:40"],
+        "Sistemas Digitais": ["Não ofertada em 2023/2"],
+        "Profissão em Sistemas de Informação": ["Não ofertada em 2023/2"],
+        "Programação Lógica": ["Terça-feira 20:50 às 22:30", "Quarta-feira 19:00 às 20:40"]
+    },
+    "3": {
+        "Estrutura de Dados 2": ["Terça-feira 19:00 às 20:40", "Quinta-feira 20:50 às 22:30"],
+        "Matemática 2": ["Segunda-feira 19:00 às 20:40", "Sexta-feira 20:50 às 22:30"],
+        "Arquitetura e Organização de Computadores": ["Terça-feira 20:50 às 22:30", "Sexta-feira 19:00 às 20:40"],
+        "Matemática para Ciência da Computação": ["Quarta-feira 19:00 às 20:40", "Segunda-feira 20:50 às 22:30"],
+        "Programação Orientada a Objetos 1": ["Quarta-feira 20:50 às 22:30", "Quinta-feira 19:00 às 20:40"]
+    },
+    "4": {
+        "Bancos de Dados 1": ["Segunda-feira 19:00 às 20:40", "Quarta-feira 20:50 às 22:30"],
+        "Estatística": ["Terça-feira 19:00 às 20:40", "Sexta-feira 20:50 às 22:30"],
+        "Sistemas Operacionais": ["Terça-feira 20:50 às 22:30", "Sexta-feira 19:00 às 20:40"],
+        "Programação para Internet": ["Quarta-feira 19:00 às 20:40", "Quinta-feira 20:50 às 22:30"],
+        "Programação Orientada a Objetos 2": ["Segunda-feira 20:50 às 22:30", "Quinta-feira 19:00 às 20:40"]
+    },
+    "5º período": {
+        "Bancos de Dados 2": ["Segunda-feira 19:00 às 20:40", "Quarta-feira 20:50 às 22:30"],
+        "Matemática Financeira e Análise de Investimentos": ["Quinta-feira 19:00 às 20:40", "Sexta-feira 20:50 às 22:30"],
+        "Redes de Computadores": ["Terça-feira 20:50 às 22:30", "Sexta-feira 19:00 às 20:40"],
+        "Organização e Recuperação da Informação": ["Terça-feira 19:00 às 20:40", "Quinta-feira 20:50 às 22:30"],
+        "Modelagem de Software": ["Segunda-feira 20:50 às 22:30", "Quarta-feira 19:00 às 20:40"]
+    },
+    "6": {
+        "Gestão Empresarial": ["Quinta-feira 19:00 às 22:30"],
+        "Otimização": ["Quarta-feira 19:00 às 20:40", "Sexta-feira 20:50 às 22:30"],
+        "Sistemas Distribuídos": ["Terça-feira 19:00 às 20:40", "Quarta-feira 20:50 às 22:30"],
+        "Contabilidade e Análise de Balanços": ["Segunda-feira 19:00 às 22:30"],
+        "Engenharia de Software": ["Terça-feira 20:50 às 22:30", "Sexta-feira 19:00 às 20:40"]
+    },
+    "7": {
+        "Economia": ["Sexta-feira 19:50 às 22:30"],
+        "Fundamentos de Marketing": ["Terça-feira 19:00 às 20:40", "Quarta-feira 20:50 às 22:30"],
+        "Gerência de Projetos de Tecnologia da Informação": ["Quarta-feira 19:00 às 20:40", "Quinta-feira 20:50 às 22:30"],
+        "Projeto e Desenvolvimento de Sistemas de Informação 1": ["Segunda-feira 19:00 às 22:30"],
+        "Trabalho de Conclusão de Curso I": ["Sexta-feira 19:00 às 19:50"],
+        "Tópicos Especiais em Inteligência Artificial": ["Terça-feira 20:50 às 22:30", "Quinta-feira 19:00 às 20:40"]
+    },
+    "8": {
+        "Auditoria e Segurança da Informação": ["Quarta-feira 19:00 às 20:40", "Quinta-feira 20:50 às 22:30"],
+        "Direito e Legislação": ["Sexta-feira 19:50 às 22:30"],
+        "Interação Humano-Computador": ["Terça-feira 19:00 às 20:40", "Quarta-feira 20:50 às 22:30"],
+        "Projeto e Desenvolvimento de Sistemas de Informação 2": ["Segunda-feira 19:00 às 22:30"],
+        "Resolução de Problemas": ["Sábado 08:50 às 12:20"]
+    }
+}
+
+    try:
+        return college_schedule
+    except json.JSONDecodeError:
+        raise ValueError(f"Resposta do modelo não é JSON válido: {text_response}")
