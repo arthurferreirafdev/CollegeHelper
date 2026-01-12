@@ -25,6 +25,8 @@ import json
 from datetime import datetime, timedelta
 import jwt
 from functools import wraps
+from werkzeug.security import check_password_hash
+
 
 # Import our custom modules
 from student_crud import StudentCRUD
@@ -97,50 +99,43 @@ class StudentSubjectAPI:
     # AUTHENTICATION ENDPOINTS
     # ==========================================
     
-    def login(self):
-        """
-        Handle student login authentication.
-        
-        Expected JSON payload:
-        {
-            "email": "student@school.edu",
-            "password": "password123"
-        }
-        
-        Returns:
-            JSON response with authentication token or error
-        """
-        try:
-            data = request.get_json()
-            
-            if not data or not data.get('email') or not data.get('password'):
-                return jsonify({'error': 'Email and password are required'}), 400
-            
-            # Authenticate student
-            student = self.crud.authenticate_student(data['email'], data['password'])
-            
-            if student:
-                # Generate JWT token
-                token = self._generate_token(student['id'])
-                
-                return jsonify({
-                    'success': True,
-                    'message': 'Login successful',
-                    'token': token,
-                    'student': {
-                        'id': student['id'],
-                        'email': student['email'],
-                        'first_name': student['first_name'],
-                        'last_name': student['last_name'],
-                        'grade_level': student['grade_level']
-                    }
-                }), 200
-            else:
-                return jsonify({'error': 'Invalid email or password'}), 401
-                
-        except Exception as e:
-            return jsonify({'error': f'Login failed: {str(e)}'}), 500
-    
+def login(self):
+    """
+    Handle student login authentication.
+    """
+    try:
+        data = request.get_json()
+
+        if not data or not data.get('email') or not data.get('password'):
+            return jsonify({'error': 'Email and password are required'}), 400
+
+        email = data['email']
+        password_from_form = data['password']
+
+        student = self.crud.authenticate_student(email, password_from_form)
+
+        if not student:
+            return jsonify({'error': 'Invalid email or password'}), 401
+
+        # 🔑 Gera o token JWT
+        token = self._generate_token(student['id'])
+
+        return jsonify({
+            'success': True,
+            'message': 'Login successful',
+            'token': token,
+            'student': {
+                'id': student['id'],
+                'email': student['email'],
+                'first_name': student['first_name'],
+                'last_name': student['last_name'],
+                'grade_level': student['grade_level']
+            }
+        }), 200
+
+    except Exception as e:
+        return jsonify({'error': f'Login failed: {str(e)}'}), 500
+
     def register(self):
         """
         Handle new student registration.
