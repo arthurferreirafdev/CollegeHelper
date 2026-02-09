@@ -431,7 +431,7 @@ const parseUploadedFile = async (file: File) => {
       totalAvailableHours: calculateTotalAvailableHours(),
     }
 
-    const response = await fetch("http://localhost:8000/submit-preferences", {
+    const response = await fetch("http://localhost:5000/api/submit-preferences", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(pip install:*)",
+      "Bash(python -m pytest:*)",
+      "Bash(timeout 5 python:*)",
+      "Bash(move:*)",
+      "Bash(git mv:*)",
+      "Bash(npm install:*)",
+      "Bash(npx next build)",
+      "Bash(timeout 15 npx next dev:*)"
+    ]
+  }
+}
