@@ -154,6 +154,16 @@ npm install
 # Iniciar servidor Next.js (porta 3000)
 npm run dev
 ```
+### obs. Database
+
+```bash
+# Adicioanr as variaveis do db ao .env
+# POSTGRESQL_PASSWORD=<senha>
+vim postgresql.env
+
+# Levantar container do banco de dados
+docker-compose -f docker-compose.db.yml up -d 
+```
 
 ### 4. Acessar
 
