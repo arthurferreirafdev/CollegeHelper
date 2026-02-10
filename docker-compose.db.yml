@@ -1,0 +1,16 @@
+version: "3.9"
+
+services:
+  college-helper-db:
+    image: bitnami/postgresql:latest
+    container_name: college-helper-db
+    env_file:
+      - postgresql.env
+    volumes:
+      - college-helper-data:/bitnami/postgresql
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+volumes:
+  college-helper-data:
