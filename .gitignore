@@ -43,3 +43,5 @@ data/*.db
 .vs/
 .vscode/
 .idea/
+
+postgresql.env
