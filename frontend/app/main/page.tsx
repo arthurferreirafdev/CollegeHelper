@@ -18,6 +18,7 @@
 
   import type React from "react"
   import { useState, useRef } from "react"
+  import { useRouter } from "next/navigation"
   import { Button } from "@/components/ui/button"
   import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
   import { Input } from "@/components/ui/input"
@@ -98,6 +99,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
   //   })
 
   export default function MainForm() {
+  const router = useRouter()
   const [formData, setFormData] = useState<FormData>({
     subjectCount: 2,
     preferenceStrategy: "",
@@ -443,6 +445,8 @@ const parseUploadedFile = async (file: File) => {
 
     if (result.success) {
       setSubmitStatus("success")
+      localStorage.setItem('scheduleResult', JSON.stringify(result.schedule))
+      router.push('/results')
     } else {
       setSubmitStatus("error")
       setErrorMessage(result.message || "Failed to submit preferences")

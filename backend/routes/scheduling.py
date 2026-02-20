@@ -1,7 +1,6 @@
 import logging
-from datetime import time
-from flask import Blueprint, request, jsonify, g
-from backend.middleware.auth_middleware import require_auth
+from flask import Blueprint, request, jsonify
+from backend.services.ai_service import AIService
 from backend.services.scheduler_service import (
     SchedulerService, SchedulingPreferences, SchedulingStrategy,
     StudentAvailability, TimeSlot
@@ -25,35 +24,11 @@ def submit_preferences():
         return jsonify({'error': 'No data provided'}), 400
 
     try:
-        weekly = []
-        for day_data in data.get('weeklySchedule', []):
-            slots = []
-            if day_data.get('available', False):
-                for sl in day_data.get('timeSlots', []):
-                    slots.append(TimeSlot(
-                        day=day_data['day'],
-                        start_time=time.fromisoformat(sl['start']),
-                        end_time=time.fromisoformat(sl['end'])
-                    ))
-            weekly.append(StudentAvailability(
-                day=day_data['day'],
-                available=day_data.get('available', False),
-                time_slots=slots
-            ))
+        ai_service = AIService()
+        if not ai_service.is_available():
+            return jsonify({'error': 'AI service unavailable. OPENAI_API_KEY not configured.'}), 503
 
-        prefs = SchedulingPreferences(
-            student_id=0,
-            subject_count=data.get('subjectCount', 5),
-            strategy=STRATEGY_MAP.get(data.get('preferenceStrategy', ''), SchedulingStrategy.INTEREST_BASED),
-            prioritize_dependencies=data.get('prioritizeDependencies', False),
-            include_saturday=data.get('includeSaturday', False),
-            weekly_availability=weekly,
-            additional_notes=data.get('additionalNotes', ''),
-            uploaded_subjects=data.get('uploadedSubjects', [])
-        )
-
-        scheduler = SchedulerService()
-        result = scheduler.create_optimal_schedule(prefs)
+        result = ai_service.generate_schedule(data)
         return jsonify(result), 200 if result.get('success') else 400
     except Exception as e:
         logger.error(f'Submit preferences error: {e}')
