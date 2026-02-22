@@ -8,7 +8,7 @@ class SubjectRepository:
     @staticmethod
     def get_all(active_only=True):
         db = get_db()
-        query = '''SELECT id, name, code, description, category, difficulty_level,
+        query = '''SELECT id, name, code, description, category,course_id, difficulty_level,
                    credits, prerequisites, teacher_name, max_students, semester,
                    schedule, is_active, created_at FROM subjects'''
         if active_only:

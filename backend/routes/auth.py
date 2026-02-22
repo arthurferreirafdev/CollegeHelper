@@ -17,8 +17,8 @@ def register():
         if not data.get(field):
             return jsonify({'error': f'{field} is required'}), 400
 
-    if not (9 <= data['grade_level'] <= 12):
-        return jsonify({'error': 'Grade level must be between 9 and 12'}), 400
+    if not (1 <= data['grade_level'] <= 12):
+        return jsonify({'error': 'Grade level must be between 1 and 12'}), 400
 
     password_hash = AuthService.hash_password(data['password'])
     student_id = StudentRepository.create(

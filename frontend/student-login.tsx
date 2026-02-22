@@ -67,20 +67,31 @@ export default function StudentLogin() {
     }
 
     try {
-      // Attempt authentication with backend API
-      // const response = await apiClient.login({ email, password })
-      const response = true
+// Fazendo a chamada real para a API Flask
+      const response = await apiClient.login({ email, password })
 
-      if (response) {
-        setSuccess("Login successful! Redirecting to dashboard...")
+      if (response && response.success) { 
+        setSuccess("Login efetuado com sucesso! Redirecionando...")
 
-        // Store user information in localStorage for persistence
-        // localStorage.setItem("student_data", JSON.stringify(response.student))
+        // SALVANDO O TOKEN (O Crachá de acesso!)
+        if (response.token) {
+          try {
+            // Usa o método oficial do ApiClient, conforme documentado
+            apiClient.setToken(response.token)
+          } catch (e) {
+            // Plano B caso o método esteja estruturado de forma diferente
+            localStorage.setItem("token", response.token)
+          }
+        }
 
-        // Redirect to dashboard after successful login
+        // Salvando os dados do aluno no storage
+        if (response.student) {
+            localStorage.setItem("student_data", JSON.stringify(response.student))
+        }
+
+        // Redirecionamento
         setTimeout(() => {
           router.push("/main")
-          
         }, 1500)
       } else {
         setError("Login failed. Please check your credentials.")
@@ -123,7 +134,7 @@ export default function StudentLogin() {
             </div>
             <BookOpen className="h-8 w-8 text-blue-600" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">EduChoice</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">CollegeHelper</h1>
           <p className="text-gray-600">Find your perfect subjects based on your interests</p>
         </div>
 

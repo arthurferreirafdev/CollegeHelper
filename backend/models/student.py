@@ -34,7 +34,8 @@ class StudentRepository:
     def find_by_id(student_id):
         db = get_db()
         row = db.execute(
-            '''SELECT id, email, first_name, last_name, grade_level, date_of_birth,
+            '''SELECT id, email, first_name, last_name, grade_level, 
+               enrollment_number, course_id, date_of_birth,
                phone_number, guardian_email, is_active, created_at, updated_at
                FROM students WHERE id = ?''',
             (student_id,)
@@ -45,6 +46,7 @@ class StudentRepository:
     def update(student_id, **kwargs):
         db = get_db()
         valid_fields = ['email', 'first_name', 'last_name', 'grade_level',
+                        'enrollment_number', 'course_id',
                         'date_of_birth', 'phone_number', 'guardian_email', 'is_active']
         updates = []
         values = []
