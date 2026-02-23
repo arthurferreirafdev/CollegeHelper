@@ -1,6 +1,6 @@
 import logging
 from flask import Blueprint, request, jsonify
-from backend.models.student import StudentRepository
+from backend.models.studentRepository import StudentRepository
 from backend.services.auth_service import AuthService
 
 logger = logging.getLogger(__name__)
