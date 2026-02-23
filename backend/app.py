@@ -3,17 +3,20 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 
 from backend.config import Config
-from backend.models.database import close_db, init_db, DATABASE_PATH
+from backend.repository.database import close_db, init_db, DATABASE_PATH
+from dotenv import load_dotenv
 
 logger = logging.getLogger(__name__)
 
 
 def create_app(config=None):
     app = Flask(__name__)
+    load_dotenv()
 
     cfg = config or Config()
     app.config['SECRET_KEY'] = cfg.SECRET_KEY
     app.config['JWT_SECRET_KEY'] = cfg.JWT_SECRET_KEY
+    app.config.from_object(Config)
 
     # CORS
     CORS(app, origins=[cfg.FRONTEND_URL, "http://localhost:3000", "http://127.0.0.1:3000"], supports_credentials=True)
