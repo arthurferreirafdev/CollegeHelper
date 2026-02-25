@@ -1,5 +1,4 @@
-"use server";
-
+// "use server";
 import { RegisterStudentFormData } from "@/components/forms/RegisterStudentForm";
 
 export interface RegisterResponse {
@@ -20,7 +19,10 @@ export async function registerStudent(
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          grade_level: Number(data.grade_level), // 🔥 IMPORTANTE
+        }),
       }
     );
 
@@ -33,6 +35,7 @@ export async function registerStudent(
     return result;
 
   } catch (error) {
+    console.error(error);
     return { error: "Unexpected error occurred" };
   }
 }

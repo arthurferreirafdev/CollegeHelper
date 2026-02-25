@@ -1,6 +1,6 @@
 import logging
 from flask import Blueprint, request, jsonify
-from backend.models.studentRepository import StudentRepository
+from backend.repository.studentRepository import StudentRepository
 from backend.services.auth_service import AuthService
 
 logger = logging.getLogger(__name__)
@@ -8,6 +8,7 @@ auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/api/auth/register', methods=['POST'])
 def register():
+    
     data = request.get_json()
     if not data:
         return jsonify({'error': 'No data provided'}), 400

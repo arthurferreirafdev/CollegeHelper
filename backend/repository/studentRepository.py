@@ -3,7 +3,6 @@ from backend.repository.database import get_db
 
 logger = logging.getLogger(__name__)
 
-
 class StudentRepository:
 
     @staticmethod

@@ -31,8 +31,13 @@ def close_db(e=None):
 
 def init_db(app):
     with app.app_context():
-        db = get_db()
+        conn = get_db()
         schema_path = os.path.join(os.path.dirname(__file__), 'schema.sql')
+
         with open(schema_path, 'r') as f:
-            db.executescript(f.read())
-        db.commit()
+            sql = f.read()
+
+        with conn.cursor() as cur:
+            cur.execute(sql)
+
+        conn.commit()

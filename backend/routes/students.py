@@ -1,7 +1,7 @@
 import logging
 from flask import Blueprint, request, jsonify, g
 from backend.middleware.auth_middleware import require_auth
-from backend.models.studentRepository import StudentRepository
+from backend.repository.studentRepository import StudentRepository
 from werkzeug.security import generate_password_hash
 
 logger = logging.getLogger(__name__)
