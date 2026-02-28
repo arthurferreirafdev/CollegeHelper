@@ -21,7 +21,7 @@ export async function registerStudent(
         },
         body: JSON.stringify({
           ...data,
-          grade_level: Number(data.grade_level), // 🔥 IMPORTANTE
+          grade_level: Number(data.grade_level),
         }),
       }
     );
