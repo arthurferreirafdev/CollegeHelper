@@ -147,11 +147,33 @@ export default function StudentLoginForm() {
                 )}
               </Button>
 
-              <div className="text-center text-sm">
-                <Link href="/register" className="text-blue-600 hover:underline">
-                  Don’t have an account? Sign up
-                </Link>
-              </div>
+              {/* Divider */}
+<div className="relative my-4">
+  <div className="absolute inset-0 flex items-center">
+    <span className="w-full border-t" />
+  </div>
+  <div className="relative flex justify-center text-xs uppercase">
+    <span className="bg-white px-2 text-gray-500">
+      Or
+    </span>
+  </div>
+</div>
+
+{/* Register Section */}
+<div className="text-center space-y-3">
+  <p className="text-sm text-gray-600">
+    Don’t have an account?
+  </p>
+
+  <Button
+    type="button"
+    variant="outline"
+    className="w-full"
+    onClick={() => router.push("/register")}
+  >
+    Create Account
+  </Button>
+</div>
 
             </form>
           </CardContent>
