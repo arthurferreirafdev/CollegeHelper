@@ -1,5 +1,6 @@
-import sqlite3
 import os
+import psycopg2
+import psycopg2.extras
 from flask import g, current_app
 
 DATABASE_PATH = os.getenv('DATABASE_PATH', 'data/student_subjects.db')
@@ -7,18 +8,11 @@ DATABASE_PATH = os.getenv('DATABASE_PATH', 'data/student_subjects.db')
 # Shared in-memory connection for testing
 _memory_db = None
 
-
-import psycopg2
-from flask import g, current_app
-
-import psycopg
-from flask import g, current_app
-
 def get_db():
     if "db" not in g:
-        g.db = psycopg.connect(
-            conninfo=current_app.config["DATABASE_URL"],
-            row_factory=psycopg.rows.dict_row  # retorna resultados como dicionário
+        g.db = psycopg2.connect(
+            current_app.config["DATABASE_URL"],
+            cursor_factory=psycopg2.extras.RealDictCursor
         )
     return g.db
 
