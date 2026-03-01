@@ -43,14 +43,11 @@ def login():
         return jsonify({'error': 'Email and password are required'}), 400
 
     student = StudentRepository.find_by_email(data['email'])
-    print(student)
     if not student or not AuthService.verify_password(data['password'], student['password_hash']):
         return jsonify({
-        'success': False,
-        'message': 'Invalid email or password',
-        'token': token,
-        'student': {}
-    }), 401
+            'success': False,
+            'message': 'Invalid email or password'
+        }), 401
 
     token = AuthService.generate_token(student['id'])
     return jsonify({
