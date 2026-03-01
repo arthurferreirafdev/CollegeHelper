@@ -6,22 +6,22 @@ from backend.services.scheduler_service import (
     StudentAvailability, TimeSlot
 )
 
-logger = logging.getLogger(__name__)
-scheduling_bp = Blueprint('scheduling', __name__)
+# logger = logging.getLogger(__name__)
+# scheduling_bp = Blueprint('scheduling', __name__)
 
-STRATEGY_MAP = {
-    'maximize_subjects': SchedulingStrategy.MAXIMIZE_SUBJECTS,
-    'clear_dependencies': SchedulingStrategy.CLEAR_DEPENDENCIES,
-    'balanced_difficulty': SchedulingStrategy.BALANCED_DIFFICULTY,
-    'interest_based': SchedulingStrategy.INTEREST_BASED,
-    'high_value_credits': SchedulingStrategy.HIGH_VALUE_CREDITS,
-}
+# STRATEGY_MAP = {
+#     'maximize_subjects': SchedulingStrategy.MAXIMIZE_SUBJECTS,
+#     'clear_dependencies': SchedulingStrategy.CLEAR_DEPENDENCIES,
+#     'balanced_difficulty': SchedulingStrategy.BALANCED_DIFFICULTY,
+#     'interest_based': SchedulingStrategy.INTEREST_BASED,
+#     'high_value_credits': SchedulingStrategy.HIGH_VALUE_CREDITS,
+# }
 
-@scheduling_bp.route('/api/submit-preferences', methods=['POST'])
-def submit_preferences():
-    data = request.get_json()
-    if not data:
-        return jsonify({'error': 'No data provided'}), 400
+# @scheduling_bp.route('/api/submit-preferences', methods=['POST'])
+# def submit_preferences():
+#     data = request.get_json()
+#     if not data:
+#         return jsonify({'error': 'No data provided'}), 400
 
     try:
         ai_service = AIService()

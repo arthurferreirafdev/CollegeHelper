@@ -1,6 +1,6 @@
 import logging
 from flask import Blueprint, request, jsonify
-from backend.models.subject import SubjectRepository
+from backend.repository.subjectRepository import SubjectRepository
 
 logger = logging.getLogger(__name__)
 subjects_bp = Blueprint('subjects', __name__)

@@ -1,7 +1,8 @@
 import logging
 from flask import Blueprint, request, jsonify, g
 from backend.middleware.auth_middleware import require_auth
-from backend.models.student import StudentRepository
+from backend.repository.studentRepository import StudentRepository
+from werkzeug.security import generate_password_hash
 
 logger = logging.getLogger(__name__)
 students_bp = Blueprint('students', __name__)
@@ -25,3 +26,45 @@ def update_profile():
     if success:
         return jsonify({'success': True, 'message': 'Profile updated successfully'}), 200
     return jsonify({'error': 'Failed to update profile'}), 400
+
+
+@students_bp.route('/api/students/register', methods=['POST'])
+def register_student():
+    data = request.get_json()
+
+    if not data:
+        return jsonify({'error': 'No data provided'}), 400
+
+    required_fields = ['email', 'password', 'first_name', 'last_name', 'grade_level']
+
+    for field in required_fields:
+        if field not in data:
+            return jsonify({'error': f'Missing required field: {field}'}), 400
+
+    try:
+        password_hash = generate_password_hash(data['password'])
+
+        student_id = StudentRepository.create(
+            email=data['email'],
+            password_hash=password_hash,
+            first_name=data['first_name'],
+            last_name=data['last_name'],
+            grade_level=data['grade_level'],
+            date_of_birth=data.get('date_of_birth'),
+            phone_number=data.get('phone_number'),
+            guardian_email=data.get('guardian_email')
+        )
+
+        print(student_id)
+
+        if not student_id:
+            return jsonify({'error': 'Failed to create student'}), 400
+
+        return jsonify({
+            'success': True,
+            'student_id': student_id,
+            'message': 'Student registered successfully'
+        }), 201
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500

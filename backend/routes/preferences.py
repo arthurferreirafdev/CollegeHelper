@@ -1,7 +1,7 @@
 import logging
 from flask import Blueprint, request, jsonify, g
 from backend.middleware.auth_middleware import require_auth
-from backend.models.preference import PreferenceRepository
+from backend.repository.preferenceRepository import PreferenceRepository
 
 logger = logging.getLogger(__name__)
 preferences_bp = Blueprint('preferences', __name__)

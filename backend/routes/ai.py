@@ -7,17 +7,20 @@ logger = logging.getLogger(__name__)
 ai_bp = Blueprint('ai', __name__)
 
 @ai_bp.route('/api/ai/recommendations', methods=['POST'])
-@require_auth
+# @require_auth
 def get_recommendations():
     ai = AIService()
     if not ai.is_available():
         return jsonify({'error': 'AI features not available - OpenAI API key not configured'}), 503
 
+    print("RECOMENDATIOOOOOOOOOONSNS", request.get_json())
     data = request.get_json() or {}
     result = ai.get_subject_recommendations(
-        student_id=g.current_student_id,
+        student_id="g.current_student_id",
         additional_context=data.get('additional_context', '')
     )
+
+    print(result)
     return jsonify(result), 200
 
 @ai_bp.route('/api/ai/subject-analysis', methods=['POST'])

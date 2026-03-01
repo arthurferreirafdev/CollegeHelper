@@ -433,13 +433,16 @@ const parseUploadedFile = async (file: File) => {
       totalAvailableHours: calculateTotalAvailableHours(),
     }
 
-    const response = await fetch("http://localhost:5000/api/submit-preferences", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(submissionData),
-    })
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/ai/recommendations`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(submissionData),
+      }
+    )
 
     const result = await response.json()
 

@@ -2,6 +2,7 @@ import os
 import json
 import logging
 import re
+import string
 from typing import Optional
 
 logger = logging.getLogger(__name__)
@@ -23,6 +24,16 @@ class AIService:
 
     def _chat(self, system_prompt: str, user_prompt: str) -> Optional[str]:
         try:
+            # response = self.client.chat.completions.create(
+            #     model='gpt-4o-mini',
+            #     messages=[
+            #         {'role': 'system', 'content': system_prompt},
+            #         # {'role': 'user', 'content': user_prompt}
+            #     ],
+            #     temperature=0.7,
+            #     max_tokens=1500
+            # )
+
             response = self.client.chat.completions.create(
                 model='gpt-4o-mini',
                 messages=[
@@ -32,7 +43,10 @@ class AIService:
                 temperature=0.7,
                 max_tokens=2000
             )
-            return response.choices[0].message.content
+            
+            # return response.choices[0].message.content
+            return response.text
+
         except Exception as e:
             logger.error(f'OpenAI API error: {e}')
             return None

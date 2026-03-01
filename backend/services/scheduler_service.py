@@ -89,7 +89,7 @@ class SchedulerService:
             return {'success': False, 'error': str(e), 'timestamp': datetime.now().isoformat()}
 
     def _get_available_subjects(self, preferences: SchedulingPreferences) -> List[Subject]:
-        from backend.models.subject import SubjectRepository
+        from backend.repository.subject import SubjectRepository
         subjects = []
         for s in SubjectRepository.get_all():
             time_slots = self._parse_schedule(s.get('schedule', ''))

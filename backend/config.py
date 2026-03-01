@@ -5,6 +5,7 @@ load_dotenv()
 
 
 class Config:
+    DATABASE_URL = os.getenv('DATABASE_URL')
     DATABASE_PATH = os.getenv('DATABASE_PATH', 'data/student_subjects.db')
     API_HOST = os.getenv('API_HOST', 'localhost')
     API_PORT = int(os.getenv('API_PORT', 5000))
