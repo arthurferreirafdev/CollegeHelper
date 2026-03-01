@@ -153,12 +153,11 @@ class APIClient {
    * Make an authenticated API request with proper error handling
    */
   private async makeRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    const url = `${this.baseURL}${endpoint}`
+    const url = `${process.env.NEXT_PUBLIC_API_URL}${endpoint}`
 
     // Prepare headers
     const headers: HeadersInit = {
-      "Content-Type": "application/json",
-      ...options.headers,
+      "Content-Type": "application/json"
     }
 
     // // Add authentication token if available
@@ -194,19 +193,28 @@ class APIClient {
   /**
    * Authenticate a student with email and password
    */
-  async login(credentials: LoginRequest): Promise<{ success: boolean; token: string; student: Student }> {
-    const response = await this.makeRequest<{ success: boolean; token: string; student: Student }>("/auth/login", {
-      method: "POST",
-      body: JSON.stringify(credentials),
-    })
+async login(
+  credentials: LoginRequest
+): Promise<{ success: boolean; token: string; student: Student }> {
 
-    // Store the token if login successful
-    if (response.success && response.token) {
-      this.setToken(response.token)
-    }
+  const response = await this.makeRequest<{
+    success: boolean
+    token: string
+    student: Student
+  }>("/api/auth/login", {   // 👈 BARRA ADICIONADA
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(credentials),
+  })
 
-    return response
+  if (response.success && response.token) {
+    this.setToken(response.token)
   }
+
+  return response
+}
 
   /**
    * Register a new student account

@@ -1,4 +1,4 @@
-import bcrypt
+from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 from datetime import datetime, timedelta, timezone
 from typing import Optional
@@ -8,11 +8,11 @@ from flask import current_app
 class AuthService:
     @staticmethod
     def hash_password(password: str) -> str:
-        return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        return generate_password_hash(password)
 
     @staticmethod
     def verify_password(password: str, password_hash: str) -> bool:
-        return bcrypt.checkpw(password.encode('utf-8'), password_hash.encode('utf-8'))
+        return check_password_hash(password_hash, password)
 
     @staticmethod
     def generate_token(student_id: int) -> str:
