@@ -203,7 +203,7 @@ export default function GradesPage() {
             <AlertDialogAction
               onClick={handleDelete}
               disabled={deleting}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-red-600 hover:bg-red-700 text-white"
             >
               {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Deletar'}
             </AlertDialogAction>
