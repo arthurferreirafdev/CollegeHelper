@@ -175,10 +175,10 @@ class APIClient {
       "Content-Type": "application/json"
     }
 
-    // // Add authentication token if available
-    // if (this.token) {
-    //   headers["Authorization"] = `Bearer ${this.token}`
-    // }
+    // Add authentication token if available
+    if (this.token) {
+      headers["Authorization"] = `Bearer ${this.token}`
+    }
 
     try {
       const response = await fetch(url, {
