@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation'; // Importamos o useRouter
 import { cn } from '@/lib/utils';
-import { GraduationCap, LogOut, User, BookOpen, Send, LayoutDashboard } from 'lucide-react';
+import { GraduationCap, LogOut, User, BookOpen, Send, LayoutDashboard, Calendar } from 'lucide-react';
 import { apiClient } from '@/lib/api'; // Importamos o cliente da API
 
 export function Navbar() {
@@ -12,6 +12,7 @@ export function Navbar() {
 
   const navItems = [
     { name: 'Enviar Grade', href: '/main', icon: Send },
+    { name: 'Minhas Grades', href: '/main/grades', icon: Calendar },
     { name: 'Listar Disciplinas', href: '/main/subjects', icon: BookOpen },
     { name: 'Perfil', href: '/main/profile', icon: User },
   ];
