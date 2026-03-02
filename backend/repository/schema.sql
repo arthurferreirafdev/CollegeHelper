@@ -69,3 +69,44 @@ CREATE INDEX IF NOT EXISTS idx_preferences_student
 
 CREATE INDEX IF NOT EXISTS idx_preferences_subject 
     ON student_preferences(subject_id);
+
+-- Grade Horaria Tables
+CREATE TABLE IF NOT EXISTS grade_horaria (
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    student_id INTEGER UNIQUE NOT NULL,
+    semester TEXT,
+    status TEXT DEFAULT 'draft',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+
+    CONSTRAINT fk_grade_student
+        FOREIGN KEY (student_id)
+        REFERENCES students(id)
+        ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS grade_horaria_subjects (
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    grade_id INTEGER NOT NULL,
+    subject_id INTEGER NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+
+    CONSTRAINT fk_grade
+        FOREIGN KEY (grade_id)
+        REFERENCES grade_horaria(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_grade_subject
+        FOREIGN KEY (subject_id)
+        REFERENCES subjects(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT unique_grade_subject
+        UNIQUE(grade_id, subject_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_grade_student 
+    ON grade_horaria(student_id);
+
+CREATE INDEX IF NOT EXISTS idx_grade_subjects_grade 
+    ON grade_horaria_subjects(grade_id);

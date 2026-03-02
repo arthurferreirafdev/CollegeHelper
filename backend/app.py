@@ -34,6 +34,7 @@ def create_app(config=None):
     from backend.routes.subjects import subjects_bp
     from backend.routes.preferences import preferences_bp
     from backend.routes.ai import ai_bp
+    from backend.routes.grade_horaria import grade_horaria_bp
     # from backend.routes.scheduling import scheduling_bp
 
     app.register_blueprint(health_bp)
@@ -42,6 +43,7 @@ def create_app(config=None):
     app.register_blueprint(subjects_bp)
     app.register_blueprint(preferences_bp)
     app.register_blueprint(ai_bp)
+    app.register_blueprint(grade_horaria_bp)
     # app.register_blueprint(scheduling_bp)
 
     # Register error handlers
