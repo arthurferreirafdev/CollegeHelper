@@ -9,7 +9,8 @@ class GradeHorariaRepository:
             "INSERT INTO grade_horaria (student_id, semester, status) VALUES (%s, %s, %s) RETURNING id",
             (student_id, semester, status)
         )
-        grade_id = cursor.fetchone()[0]
+        result = cursor.fetchone()
+        grade_id = result['id'] if isinstance(result, dict) else result[0]
         db.commit()
         return grade_id
 
@@ -25,6 +26,8 @@ class GradeHorariaRepository:
         row = cursor.fetchone()
         if not row:
             return None
+        if isinstance(row, dict):
+            return row
         return {
             'id': row[0],
             'student_id': row[1],
@@ -46,6 +49,8 @@ class GradeHorariaRepository:
         row = cursor.fetchone()
         if not row:
             return None
+        if isinstance(row, dict):
+            return row
         return {
             'id': row[0],
             'student_id': row[1],
@@ -89,7 +94,8 @@ class GradeHorariaRepository:
                 "INSERT INTO grade_horaria_subjects (grade_id, subject_id) VALUES (%s, %s) RETURNING id",
                 (grade_id, subject_id)
             )
-            result_id = cursor.fetchone()[0]
+            result = cursor.fetchone()
+            result_id = result['id'] if isinstance(result, dict) else result[0]
             db.commit()
             return result_id
         except Exception:
@@ -122,14 +128,17 @@ class GradeHorariaRepository:
         )
         subjects = []
         for row in cursor.fetchall():
-            subjects.append({
-                'id': row[0],
-                'name': row[1],
-                'code': row[2],
-                'category': row[3],
-                'difficulty_level': row[4],
-                'credits': row[5],
-                'schedule': row[6],
-                'teacher_name': row[7]
-            })
+            if isinstance(row, dict):
+                subjects.append(row)
+            else:
+                subjects.append({
+                    'id': row[0],
+                    'name': row[1],
+                    'code': row[2],
+                    'category': row[3],
+                    'difficulty_level': row[4],
+                    'credits': row[5],
+                    'schedule': row[6],
+                    'teacher_name': row[7]
+                })
         return subjects
