@@ -82,7 +82,7 @@ export default function StudentLoginForm() {
             </div>
             <BookOpen className="h-8 w-8 text-blue-600" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">EduChoice</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">CollegeHelper</h1>
           <p className="text-gray-600">Sign in to continue</p>
         </div>
 
@@ -148,32 +148,32 @@ export default function StudentLoginForm() {
               </Button>
 
               {/* Divider */}
-<div className="relative my-4">
-  <div className="absolute inset-0 flex items-center">
-    <span className="w-full border-t" />
-  </div>
-  <div className="relative flex justify-center text-xs uppercase">
-    <span className="bg-white px-2 text-gray-500">
-      Or
-    </span>
-  </div>
-</div>
+              <div className="relative my-4">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-white px-2 text-gray-500">
+                    Or
+                  </span>
+                </div>
+              </div>
 
-{/* Register Section */}
-<div className="text-center space-y-3">
-  <p className="text-sm text-gray-600">
-    Don’t have an account?
-  </p>
+              {/* Register Section */}
+              <div className="text-center space-y-3">
+                <p className="text-sm text-gray-600">
+                  Don’t have an account?
+                </p>
 
-  <Button
-    type="button"
-    variant="outline"
-    className="w-full"
-    onClick={() => router.push("/register")}
-  >
-    Create Account
-  </Button>
-</div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => router.push("/register")}
+                >
+                  Create Account
+                </Button>
+              </div>
 
             </form>
           </CardContent>

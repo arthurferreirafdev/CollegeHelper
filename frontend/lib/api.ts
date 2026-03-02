@@ -104,6 +104,21 @@ export interface AIStudyPlanRequest {
   semester?: string
 }
 
+export interface GradeHoraria {
+  id: number
+  student_id: number
+  semester?: string
+  status: string
+  created_at: string
+  updated_at: string
+  subjects?: Subject[]
+}
+
+export interface GradeHorariaRequest {
+  semester?: string
+  status?: string
+}
+
 /**
  * API Client class that handles all communication with the backend
  */
@@ -160,10 +175,10 @@ class APIClient {
       "Content-Type": "application/json"
     }
 
-    // // Add authentication token if available
-    // if (this.token) {
-    //   headers["Authorization"] = `Bearer ${this.token}`
-    // }
+    // Add authentication token if available
+    if (this.token) {
+      headers["Authorization"] = `Bearer ${this.token}`
+    }
 
     try {
       const response = await fetch(url, {
@@ -358,6 +373,65 @@ class APIClient {
     return this.makeRequest<any>("/ai/study-plan", {
       method: "POST",
       body: JSON.stringify(request),
+    })
+  }
+
+  // ==========================================
+  // GRADE HORARIA METHODS
+  // ==========================================
+
+  /**
+   * Get the current student's grade horaria
+   */
+  async getGradeHoraria(): Promise<{ success: boolean; grade: GradeHoraria }> {
+    return this.makeRequest<{ success: boolean; grade: GradeHoraria }>("/grade-horaria")
+  }
+
+  /**
+   * Create a new grade horaria
+   */
+  async createGradeHoraria(data: GradeHorariaRequest): Promise<{ success: boolean; grade_id: number }> {
+    return this.makeRequest<{ success: boolean; grade_id: number }>("/grade-horaria", {
+      method: "POST",
+      body: JSON.stringify(data),
+    })
+  }
+
+  /**
+   * Update grade horaria
+   */
+  async updateGradeHoraria(gradeId: number, data: GradeHorariaRequest): Promise<{ success: boolean }> {
+    return this.makeRequest<{ success: boolean }>(`/grade-horaria/${gradeId}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    })
+  }
+
+  /**
+   * Delete grade horaria
+   */
+  async deleteGradeHoraria(gradeId: number): Promise<{ success: boolean }> {
+    return this.makeRequest<{ success: boolean }>(`/grade-horaria/${gradeId}`, {
+      method: "DELETE",
+    })
+  }
+
+  /**
+   * Add subject to grade horaria
+   */
+  async addSubjectToGrade(gradeId: number, subjectId: number): Promise<{ success: boolean }> {
+    return this.makeRequest<{ success: boolean }>(`/grade-horaria/${gradeId}/subjects`, {
+      method: "POST",
+      body: JSON.stringify({ subject_id: subjectId }),
+    })
+  }
+
+  /**
+   * Remove subject from grade horaria
+   */
+  async removeSubjectFromGrade(gradeId: number, subjectId: number): Promise<{ success: boolean }> {
+    return this.makeRequest<{ success: boolean }>(`/grade-horaria/${gradeId}/subjects/${subjectId}`, {
+      method: "DELETE",
     })
   }
 

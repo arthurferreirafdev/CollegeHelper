@@ -50,8 +50,11 @@ CollegeHelper/
 │   │   ├── layout.tsx         #     Layout raiz
 │   │   ├── page.tsx           #     Home - renderiza login
 │   │   ├── globals.css        #     Estilos globais (Tailwind)
-│   │   └── main/
-│   │       └── page.tsx       #     Dashboard principal
+│   │   ├── main/
+│   │   │   ├── page.tsx       #     Dashboard principal
+│   │   │   ├── grades/        #     Gestao de grades horarias
+│   │   │   ├── subjects/      #     Listagem de disciplinas
+│   │   │   └── profile/       #     Perfil do estudante
 │   ├── components/            #   Componentes React
 │   │   ├── main-form.tsx      #     Formulario de preferencias
 │   │   ├── theme-provider.tsx #     Provider de tema (dark/light)
@@ -81,13 +84,15 @@ CollegeHelper/
 │   │   ├── schema.sql         #     DDL completo do banco
 │   │   ├── student.py         #     StudentRepository
 │   │   ├── subject.py         #     SubjectRepository
-│   │   └── preference.py      #     PreferenceRepository
+│   │   ├── preference.py      #     PreferenceRepository
+│   │   └── grade_horaria.py   #     GradeHorariaRepository
 │   ├── routes/                #   Endpoints da API
 │   │   ├── health.py          #     GET /api/health
 │   │   ├── auth.py            #     /api/auth/*
 │   │   ├── students.py        #     /api/students/*
 │   │   ├── subjects.py        #     /api/subjects/*
 │   │   ├── preferences.py     #     /api/preferences/*
+│   │   ├── grade_horaria.py   #     /api/grade-horaria/*
 │   │   ├── ai.py              #     /api/ai/*
 │   │   └── scheduling.py      #     /api/submit-preferences
 │   ├── services/              #   Logica de negocio
@@ -227,6 +232,21 @@ Gerencia preferencias de disciplinas dos estudantes.
 | `add()` | `student_id, subject_id, interest_level, priority=None, notes=None, status='interested'` | `int \| None` | Adiciona preferencia (INSERT OR REPLACE). Constraint UNIQUE(student_id, subject_id) |
 | `remove()` | `preference_id, student_id` | `bool` | Remove preferencia. Valida que pertence ao estudante |
 
+#### `GradeHorariaRepository` (`backend/models/grade_horaria.py`)
+
+Gerencia grades horarias dos estudantes (CRUD completo).
+
+| Metodo | Parametros | Retorno | Descricao |
+|--------|-----------|---------|-----------|
+| `create()` | `student_id, semester=None, status='draft'` | `int \| None` | Cria grade horaria. Um estudante pode ter apenas uma grade (UNIQUE constraint) |
+| `find_by_id()` | `grade_id` | `dict \| None` | Busca grade por ID. Retorna id, student_id, semester, status, created_at, updated_at |
+| `find_by_student()` | `student_id` | `dict \| None` | Busca grade do estudante |
+| `update()` | `grade_id, **kwargs` | `bool` | Atualiza campos permitidos: semester, status. Seta `updated_at` automaticamente |
+| `delete()` | `grade_id` | `bool` | Remove grade horaria |
+| `add_subject()` | `grade_id, subject_id` | `int \| None` | Adiciona disciplina a grade. Constraint UNIQUE(grade_id, subject_id) |
+| `remove_subject()` | `grade_id, subject_id` | `bool` | Remove disciplina da grade |
+| `get_subjects()` | `grade_id` | `list[dict]` | Lista disciplinas da grade com JOIN em subjects |
+
 #### `database.py` (`backend/models/database.py`)
 
 Gerenciamento de conexao SQLite.
@@ -310,6 +330,39 @@ Relaciona estudantes com disciplinas de interesse.
 
 ---
 
+#### Tabela `grade_horaria`
+
+Armazena grades horarias dos estudantes.
+
+| Coluna | Tipo | Constraints | Default |
+|--------|------|-------------|---------|
+| `id` | INTEGER | PRIMARY KEY AUTOINCREMENT | - |
+| `student_id` | INTEGER | UNIQUE NOT NULL, FK → students(id) ON DELETE CASCADE | - |
+| `semester` | TEXT | - | - |
+| `status` | TEXT | - | 'draft' |
+| `created_at` | TIMESTAMP | - | CURRENT_TIMESTAMP |
+| `updated_at` | TIMESTAMP | - | CURRENT_TIMESTAMP |
+
+**Indices:** `idx_grade_student` (student_id)
+
+---
+
+#### Tabela `grade_horaria_subjects`
+
+Relaciona grades horarias com disciplinas.
+
+| Coluna | Tipo | Constraints | Default |
+|--------|------|-------------|---------|
+| `id` | INTEGER | PRIMARY KEY AUTOINCREMENT | - |
+| `grade_id` | INTEGER | FK → grade_horaria(id) ON DELETE CASCADE | - |
+| `subject_id` | INTEGER | FK → subjects(id) ON DELETE CASCADE | - |
+| `created_at` | TIMESTAMP | - | CURRENT_TIMESTAMP |
+
+**Constraints:** UNIQUE(grade_id, subject_id)
+**Indices:** `idx_grade_subjects_grade` (grade_id)
+
+---
+
 #### Diagrama de Relacionamento
 
 ```
@@ -317,6 +370,13 @@ students (1) ──────< (N) student_preferences (N) >──────
    │                         │                                │
    │ id ←─── student_id ────┘                                │
    │                         └──── subject_id ───→ id         │
+   │                                                              │
+   │                                                              │
+students (1) ──────< (1) grade_horaria (1) >──────< (N) grade_horaria_subjects (N) >────── (1) subjects
+   │                         │                                │
+   │ id ←─── student_id ────┘                                │
+   │                         id ←─── grade_id                     │
+                                                    subject_id ───→ id
 ```
 
 ---
@@ -468,6 +528,23 @@ Base URL: `http://localhost:5000/api`
 
 ---
 
+#### Grade Horaria (`/api/grade-horaria`)
+
+| Metodo | Rota | Auth | Body | Resposta |
+|--------|------|------|------|----------|
+| POST | `/api/grade-horaria` | JWT | `{"semester"?, "status"?}` | `201: {"success", "message", "grade_id"}` |
+| GET | `/api/grade-horaria` | JWT | - | `200: {"success", "grade": {...}}` |
+| GET | `/api/grade-horaria/<id>` | JWT | - | `200: {"success", "grade": {...}}` |
+| PUT | `/api/grade-horaria/<id>` | JWT | `{"semester"?, "status"?}` | `200: {"success", "message"}` |
+| DELETE | `/api/grade-horaria/<id>` | JWT | - | `200: {"success", "message"}` |
+| POST | `/api/grade-horaria/<id>/subjects` | JWT | `{"subject_id"}` | `201: {"success", "message"}` |
+| DELETE | `/api/grade-horaria/<id>/subjects/<subject_id>` | JWT | - | `200: {"success", "message"}` |
+
+**Status validos:** `draft`, `active`, `completed`
+**Restricoes:** Um estudante pode ter apenas uma grade horaria
+
+---
+
 #### IA (`/api/ai`)
 
 Todos requerem JWT. Retornam 503 se `OPENAI_API_KEY` nao configurada.
@@ -518,6 +595,11 @@ Todos requerem JWT. Retornam 503 se `OPENAI_API_KEY` nao configurada.
 |------|---------|-----------|
 | `/` | `app/page.tsx` | Pagina inicial — renderiza formulario de login |
 | `/main` | `app/main/page.tsx` | Dashboard principal — formulario de preferencias, selecao de disciplinas, upload de PDF, construtor de grade horaria |
+| `/main/grades` | `app/main/grades/page.tsx` | Listagem de grades horarias — visualizacao, edicao e exclusao |
+| `/main/grades/new` | `app/main/grades/new/page.tsx` | Criacao de nova grade horaria |
+| `/main/grades/edit/[id]` | `app/main/grades/edit/[id]/page.tsx` | Edicao de grade horaria com gerenciamento de disciplinas |
+| `/main/subjects` | `app/main/subjects/page.tsx` | Listagem e gestao de disciplinas |
+| `/main/profile` | `app/main/profile/page.tsx` | Perfil do estudante |
 
 ### Componentes
 
@@ -552,10 +634,11 @@ Classe `ApiClient` singleton (`apiClient`) com:
 | Perfil | `getProfile()`, `updateProfile()` |
 | Disciplinas | `getSubjects(category?)`, `getSubject(id)`, `getCategories()` |
 | Preferencias | `getPreferences()`, `addPreference()`, `removePreference(id)` |
+| Grade Horaria | `getGradeHoraria()`, `createGradeHoraria()`, `updateGradeHoraria()`, `deleteGradeHoraria()`, `addSubjectToGrade()`, `removeSubjectFromGrade()` |
 | IA | `getAIRecommendations()`, `analyzeSubjectFit()`, `getCareerAdvice()`, `generateStudyPlan()` |
 | Sistema | `healthCheck()` |
 
-**Interfaces TypeScript:** `Student`, `Subject`, `StudentPreference`, `LoginRequest`, `RegisterRequest`, `PreferenceRequest`, `AIRecommendationRequest`, `AISubjectAnalysisRequest`, `AICareerAdviceRequest`, `AIStudyPlanRequest`
+**Interfaces TypeScript:** `Student`, `Subject`, `StudentPreference`, `GradeHoraria`, `GradeHorariaRequest`, `LoginRequest`, `RegisterRequest`, `PreferenceRequest`, `AIRecommendationRequest`, `AISubjectAnalysisRequest`, `AICareerAdviceRequest`, `AIStudyPlanRequest`
 
 ---
 
@@ -571,6 +654,7 @@ python -m pytest tests/ -v
 | `test_auth.py` | 7 | Health check, registro, registro duplicado, campos faltantes, login, senha errada, logout |
 | `test_students.py` | 3 | Buscar perfil, perfil sem auth, atualizar perfil |
 | `test_subjects.py` | 5 | Listar disciplinas, listar categorias, disciplina nao encontrada, CRUD de preferencias, preferencias sem auth |
+| `test_grade_horaria.py` | 10 | Criar grade, duplicacao, buscar, atualizar, deletar, adicionar/remover disciplinas, sem auth |
 
 **Configuracao de testes:** Banco SQLite em memoria (`:memory:`) com singleton compartilhado para isolamento entre testes. `conftest.py` reseta `_memory_db` entre cada teste.
 
