@@ -4,7 +4,7 @@ from backend.middleware.auth_middleware import require_auth
 
 grade_horaria_bp = Blueprint('grade_horaria', __name__)
 
-@grade_horaria_bp.route('/grade-horaria', methods=['POST'])
+@grade_horaria_bp.route('/api/grade-horaria', methods=['POST'])
 @require_auth
 def create_grade():
     data = request.get_json()
@@ -29,7 +29,7 @@ def create_grade():
         'grade_id': grade_id
     }), 201
 
-@grade_horaria_bp.route('/grade-horaria', methods=['GET'])
+@grade_horaria_bp.route('/api/grade-horaria', methods=['GET'])
 @require_auth
 def get_grade():
     student_id = g.current_student_id
@@ -49,7 +49,7 @@ def get_grade():
         'grade': grade
     }), 200
 
-@grade_horaria_bp.route('/grade-horaria/<int:grade_id>', methods=['GET'])
+@grade_horaria_bp.route('/api/grade-horaria/<int:grade_id>', methods=['GET'])
 @require_auth
 def get_grade_by_id(grade_id):
     grade = GradeHorariaRepository.find_by_id(grade_id)
@@ -74,7 +74,7 @@ def get_grade_by_id(grade_id):
         'grade': grade
     }), 200
 
-@grade_horaria_bp.route('/grade-horaria/<int:grade_id>', methods=['PUT'])
+@grade_horaria_bp.route('/api/grade-horaria/<int:grade_id>', methods=['PUT'])
 @require_auth
 def update_grade(grade_id):
     grade = GradeHorariaRepository.find_by_id(grade_id)
@@ -105,7 +105,7 @@ def update_grade(grade_id):
         'message': 'No valid fields to update'
     }), 400
 
-@grade_horaria_bp.route('/grade-horaria/<int:grade_id>', methods=['DELETE'])
+@grade_horaria_bp.route('/api/grade-horaria/<int:grade_id>', methods=['DELETE'])
 @require_auth
 def delete_grade(grade_id):
     grade = GradeHorariaRepository.find_by_id(grade_id)
@@ -129,7 +129,7 @@ def delete_grade(grade_id):
         'message': 'Grade horaria deleted successfully'
     }), 200
 
-@grade_horaria_bp.route('/grade-horaria/<int:grade_id>/subjects', methods=['POST'])
+@grade_horaria_bp.route('/api/grade-horaria/<int:grade_id>/subjects', methods=['POST'])
 @require_auth
 def add_subject_to_grade(grade_id):
     grade = GradeHorariaRepository.find_by_id(grade_id)
@@ -168,7 +168,7 @@ def add_subject_to_grade(grade_id):
         'message': 'Subject already in grade or does not exist'
     }), 409
 
-@grade_horaria_bp.route('/grade-horaria/<int:grade_id>/subjects/<int:subject_id>', methods=['DELETE'])
+@grade_horaria_bp.route('/api/grade-horaria/<int:grade_id>/subjects/<int:subject_id>', methods=['DELETE'])
 @require_auth
 def remove_subject_from_grade(grade_id, subject_id):
     grade = GradeHorariaRepository.find_by_id(grade_id)
