@@ -80,7 +80,7 @@ export default function RegisterPage() {
             </div>
             <BookOpen className="h-8 w-8 text-blue-600" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">EduChoice</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">CollegeHelper</h1>
           <p className="text-gray-600">Crie sua conta para começar</p>
         </div>
 
