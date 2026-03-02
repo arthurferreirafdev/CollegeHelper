@@ -173,7 +173,7 @@ export default function ProfilePage() {
         </div>
 
         <div className="flex justify-end pt-6">
-          <Button type="submit" size="lg" disabled={isSaving}>
+          <Button type="submit" size="lg" disabled={isSaving} className="bg-blue-600 hover:bg-blue-700 text-white">
             {isSaving ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Salvando...</> : "Salvar Alterações"}
           </Button>
         </div>
@@ -191,7 +191,7 @@ export default function ProfilePage() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="sm:justify-center mt-4">
-            <Button type="button" onClick={() => setShowSuccessModal(false)} className="px-8">
+            <Button type="button" onClick={() => setShowSuccessModal(false)} className="px-8 bg-blue-600 hover:bg-blue-700 text-white">
               Entendi
             </Button>
           </DialogFooter>

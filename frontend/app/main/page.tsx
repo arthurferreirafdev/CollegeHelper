@@ -768,7 +768,7 @@ export default function MainForm() {
 
           {/* Submit Button */}
           <div className="flex justify-center">
-            <Button type="submit" size="lg" disabled={isSubmitting} className="w-full md:w-auto px-8">
+            <Button type="submit" size="lg" disabled={isSubmitting} className="w-full md:w-auto px-8 bg-blue-600 hover:bg-blue-700 text-white">
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
