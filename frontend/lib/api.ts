@@ -168,7 +168,7 @@ class APIClient {
    * Make an authenticated API request with proper error handling
    */
   private async makeRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    const url = `${this.baseURL}${endpoint}`
+    const url = `${process.env.NEXT_PUBLIC_API_URL}${endpoint}`
 
     // Prepare headers
     const headers: HeadersInit = {
@@ -216,7 +216,7 @@ class APIClient {
       success: boolean
       token: string
       student: Student
-    }>("/auth/login", {   // 👈 BARRA ADICIONADA
+    }>("/api/auth/login", {   // 👈 BARRA ADICIONADA
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -235,7 +235,7 @@ class APIClient {
    * Register a new student account
    */
   async register(userData: RegisterRequest): Promise<{ success: boolean; student_id: number }> {
-    return this.makeRequest<{ success: boolean; student_id: number }>("/auth/register", {
+    return this.makeRequest<{ success: boolean; student_id: number }>("/api/students/register", {
       method: "POST",
       body: JSON.stringify(userData),
     })
